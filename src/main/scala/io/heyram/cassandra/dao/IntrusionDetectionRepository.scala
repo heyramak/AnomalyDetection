@@ -67,6 +67,7 @@ object IntrusionDetectionRepository {
 
   def cqlTransactionBind(prepared: PreparedStatement, record: Row) = {
     val bound = prepared.bind()
+    bound.setString(Enums.TransactionCassandra.id, record.getAs[String](Enums.TransactionCassandra.id))
     bound.setTimestamp(Enums.TransactionCassandra.trans_time, record.getAs[Timestamp](Enums.TransactionCassandra.trans_time))
     bound.setDouble(Enums.TransactionCassandra.duration, record.getAs[Double](Enums.TransactionCassandra.duration))
     bound.setString(Enums.TransactionCassandra.protocol_type, record.getAs[String](Enums.TransactionCassandra.protocol_type))
@@ -116,6 +117,7 @@ object IntrusionDetectionRepository {
   def cqlTransaction(db: String, table: String, record: Row): String =
     s"""
      insert into $db.$table (
+       ${Enums.TransactionCassandra.id}
        ${Enums.TransactionCassandra.trans_time}
        ${Enums.TransactionCassandra.duration},
        ${Enums.TransactionCassandra.protocol_type},
@@ -161,6 +163,7 @@ object IntrusionDetectionRepository {
        ${Enums.TransactionCassandra.xAttack}
      )
      values(
+       '${record.getAs[String](Enums.TransactionCassandra.id)}',
        '${record.getAs[Timestamp](Enums.TransactionCassandra.trans_time)}',
         ${record.getAs[Double](Enums.TransactionCassandra.duration)},
        '${record.getAs[String](Enums.TransactionCassandra.protocol_type)}',

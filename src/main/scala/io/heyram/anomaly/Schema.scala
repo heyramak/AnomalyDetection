@@ -9,6 +9,7 @@ object Schema {
   val transactionStructureName = "transaction"
 
   val transactionSchema = new StructType()
+    .add(Enums.TransactionKafka.id, StringType, true)
     .add(Enums.TransactionKafka.trans_time, StringType, true)
     .add(Enums.TransactionKafka.duration, DoubleType, true)
     .add(Enums.TransactionKafka.protocol_type, StringType, true)
@@ -58,6 +59,7 @@ object Schema {
   /* Schema of transaction msgs received from Kafka. Json msg is received from Kafka. Hence evey field is treated as String */
   val kafkaTransactionStructureName = transactionStructureName
   val kafkaTransactionSchema = new StructType()
+    .add(Enums.TransactionKafka.id, StringType, true)
     .add(Enums.TransactionKafka.trans_time, StringType, true)
     .add(Enums.TransactionKafka.duration, DoubleType, true)
     .add(Enums.TransactionKafka.protocol_type, StringType, true)

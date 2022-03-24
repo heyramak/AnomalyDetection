@@ -4,7 +4,8 @@ import java.sql.Timestamp
 
 
 
-case class Transaction(trans_time:Timestamp,
+case class Transaction(id:String,
+                       trans_time:Timestamp,
                        duration:Double,
                        protocol_type:String,
                        service:String,

@@ -7,6 +7,7 @@ USE anomaly;
 
 CREATE TABLE IF NOT EXISTS normal
 (
+    id                          text,
     duration                    double,
     protocol_type               text,
     service                     text,
@@ -50,12 +51,13 @@ CREATE TABLE IF NOT EXISTS normal
     dst_host_srv_rerror_rate    double,
     xAttack                     text,
     trans_time                  timestamp,
-    PRIMARY KEY (trans_time)
+    PRIMARY KEY (id, trans_time)
 ) WITH CLUSTERING ORDER BY (trans_time DESC);
 
 
 CREATE TABLE IF NOT EXISTS anomaly
 (
+    id                          text,
     duration                    double,
     protocol_type               text,
     service                     text,
@@ -99,7 +101,7 @@ CREATE TABLE IF NOT EXISTS anomaly
     dst_host_srv_rerror_rate    double,
     xAttack                     text,
     trans_time                  timestamp,
-    PRIMARY KEY (trans_time)
+    PRIMARY KEY (id, trans_time)
 ) WITH CLUSTERING ORDER BY (trans_time DESC);
 
 
