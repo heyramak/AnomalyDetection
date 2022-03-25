@@ -9,8 +9,6 @@ object Schema {
   val transactionStructureName = "transaction"
 
   val transactionSchema = new StructType()
-    .add(Enums.TransactionKafka.id, StringType, true)
-    .add(Enums.TransactionKafka.trans_time, StringType, true)
     .add(Enums.TransactionKafka.duration, DoubleType, true)
     .add(Enums.TransactionKafka.protocol_type, StringType, true)
     .add(Enums.TransactionKafka.service, StringType, true)
@@ -41,6 +39,7 @@ object Schema {
     .add(Enums.TransactionKafka.srv_rerror_rate, DoubleType, true)
     .add(Enums.TransactionKafka.same_srv_rate, DoubleType, true)
     .add(Enums.TransactionKafka.diff_srv_rate, DoubleType, true)
+    .add(Enums.TransactionKafka.srv_diff_host_rate, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_count, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_srv_count, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_same_srv_rate, DoubleType, true)
@@ -51,6 +50,8 @@ object Schema {
     .add(Enums.TransactionKafka.dst_host_srv_serror_rate, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_rerror_rate, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_srv_rerror_rate, DoubleType, true)
+    .add(Enums.TransactionKafka.id, StringType, true)
+    .add(Enums.TransactionKafka.xAttack, StringType, true)
 
   /* Transaction  Schema used while importing transaction data to Cassandra*/
   val fruadCheckedTransactionSchema = transactionSchema.add(Enums.TransactionKafka.xAttack, StringType, true)
@@ -60,7 +61,6 @@ object Schema {
   val kafkaTransactionStructureName = transactionStructureName
   val kafkaTransactionSchema = new StructType()
     .add(Enums.TransactionKafka.id, StringType, true)
-    .add(Enums.TransactionKafka.trans_time, StringType, true)
     .add(Enums.TransactionKafka.duration, DoubleType, true)
     .add(Enums.TransactionKafka.protocol_type, StringType, true)
     .add(Enums.TransactionKafka.service, StringType, true)
@@ -91,6 +91,7 @@ object Schema {
     .add(Enums.TransactionKafka.srv_rerror_rate, DoubleType, true)
     .add(Enums.TransactionKafka.same_srv_rate, DoubleType, true)
     .add(Enums.TransactionKafka.diff_srv_rate, DoubleType, true)
+    .add(Enums.TransactionKafka.srv_diff_host_rate, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_count, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_srv_count, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_same_srv_rate, DoubleType, true)

@@ -1,13 +1,13 @@
-CREATE KEYSPACE IF NOT EXISTS anomaly
+CREATE KEYSPACE IF NOT EXISTS intrusionDetection
     WITH replication = {
         'class': 'SimpleStrategy', 'replication_factor': 1
         };
 
-USE anomaly;
+USE intrusionDetection;
 
 CREATE TABLE IF NOT EXISTS normal
 (
-    id                          text,
+    id                          UUID,
     duration                    double,
     protocol_type               text,
     service                     text,
@@ -49,15 +49,14 @@ CREATE TABLE IF NOT EXISTS normal
     dst_host_srv_serror_rate    double,
     dst_host_rerror_rate        double,
     dst_host_srv_rerror_rate    double,
-    xAttack                     text,
-    trans_time                  timestamp,
-    PRIMARY KEY (id, trans_time)
-) WITH CLUSTERING ORDER BY (trans_time DESC);
+    xAttack                     text
+    PRIMARY KEY (id)
+);
 
 
 CREATE TABLE IF NOT EXISTS anomaly
 (
-    id                          text,
+    id                          UUID,
     duration                    double,
     protocol_type               text,
     service                     text,
@@ -100,9 +99,8 @@ CREATE TABLE IF NOT EXISTS anomaly
     dst_host_rerror_rate        double,
     dst_host_srv_rerror_rate    double,
     xAttack                     text,
-    trans_time                  timestamp,
-    PRIMARY KEY (id, trans_time)
-) WITH CLUSTERING ORDER BY (trans_time DESC);
+    PRIMARY KEY (id)
+);
 
 
 

@@ -13,9 +13,6 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.streaming.kafka010.HasOffsetRanges
 
 
-/**
- * Created by kafka on 16/5/18.
- */
 object CassandraDriver {
 
   val logger = Logger.getLogger(getClass.getName)

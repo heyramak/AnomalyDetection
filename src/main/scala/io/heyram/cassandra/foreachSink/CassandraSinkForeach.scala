@@ -2,7 +2,6 @@ package io.heyram.cassandra.foreachSink
 
 import java.sql.Timestamp
 import java.util.Date
-import com.datamantra.cassandra.CassandraDriver
 import io.heyram.cassandra.{CassandraConfig, CassandraDriver}
 import io.heyram.anomaly.Enums
 import org.apache.log4j.Logger
@@ -64,17 +63,49 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
        ${Enums.TransactionCassandra.xAttack}
      )
      values(
-       '${record.getAs[String](Enums.TransactionCassandra.cc_num)  }',
        '${record.getAs[Timestamp](Enums.TransactionCassandra.trans_time)}',
-       '${record.getAs[String](Enums.TransactionCassandra.trans_num)}',
-       '${record.getAs[String](Enums.TransactionCassandra.category)}',
-       '${record.getAs[String](Enums.TransactionCassandra.merchant)}',
-        ${record.getAs[Double](Enums.TransactionCassandra.amt)},
-        ${record.getAs[Double](Enums.TransactionCassandra.merch_lat)},
-        ${record.getAs[Double](Enums.TransactionCassandra.merch_long)},
-        ${record.getAs[Double](Enums.TransactionCassandra.distance)},
-        ${record.getAs[Double](Enums.TransactionCassandra.age)},
-        ${record.getAs[Double](Enums.TransactionCassandra.is_fraud)}
+        ${record.getAs[Double](Enums.TransactionCassandra.duration)},
+       '${record.getAs[String](Enums.TransactionCassandra.protocol_type)}',
+       '${record.getAs[String](Enums.TransactionCassandra.service)}',
+       '${record.getAs[String](Enums.TransactionCassandra.flag)}',
+        ${record.getAs[Double](Enums.TransactionCassandra.src_bytes)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_bytes)},
+        ${record.getAs[Double](Enums.TransactionCassandra.land)},
+        ${record.getAs[Double](Enums.TransactionCassandra.wrong_fragment)},
+        ${record.getAs[Double](Enums.TransactionCassandra.urgent)}
+        ${record.getAs[Double](Enums.TransactionCassandra.hot)},
+        ${record.getAs[Double](Enums.TransactionCassandra.num_failed_logins)},
+        ${record.getAs[Double](Enums.TransactionCassandra.logged_in)},
+        ${record.getAs[Double](Enums.TransactionCassandra.num_compromised)},
+        ${record.getAs[Double](Enums.TransactionCassandra.root_shell)},
+        ${record.getAs[Double](Enums.TransactionCassandra.su_attempted)},
+        ${record.getAs[Double](Enums.TransactionCassandra.num_root)},
+        ${record.getAs[Double](Enums.TransactionCassandra.num_file_creations)},
+        ${record.getAs[Double](Enums.TransactionCassandra.num_shells)},
+        ${record.getAs[Double](Enums.TransactionCassandra.num_access_files)},
+        ${record.getAs[Double](Enums.TransactionCassandra.num_outbound_cmds)},
+        ${record.getAs[Double](Enums.TransactionCassandra.is_host_login)},
+        ${record.getAs[Double](Enums.TransactionCassandra.is_guest_login)},
+        ${record.getAs[Double](Enums.TransactionCassandra.count)},
+        ${record.getAs[Double](Enums.TransactionCassandra.srv_count)},
+        ${record.getAs[Double](Enums.TransactionCassandra.serror_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.srv_serror_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.rerror_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.srv_rerror_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.same_srv_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.diff_srv_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.srv_diff_host_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_count)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_count)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_same_srv_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_diff_srv_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_same_src_port_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_diff_host_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_serror_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_serror_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_rerror_rate)},
+        ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_rerror_rate)},
+       '${record.getAs[String](Enums.TransactionCassandra.xAttack)}'
         )"""
 
 

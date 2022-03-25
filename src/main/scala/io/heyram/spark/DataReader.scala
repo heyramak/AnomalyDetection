@@ -11,11 +11,11 @@ object DataReader {
 
   val logger = Logger.getLogger(getClass.getName)
 
-  def read(transactionDatasource:String, schema:StructType)(implicit sparkSession:SparkSession) = {
+  def read(trainingDatasource:String, schema:StructType)(implicit sparkSession:SparkSession) = {
     sparkSession.read
       .option("header", "true")
       .schema(schema)
-      .csv(transactionDatasource)
+      .csv(trainingDatasource)
   }
 
   def readFromCassandra(keySpace:String, table:String)(implicit sparkSession:SparkSession) = {

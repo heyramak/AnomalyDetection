@@ -1,17 +1,14 @@
 package io.heyram.spark.jobs.RealTimeFraudDetection
 
-import com.datamantra.cassandra.dao.{CreditcardTransactionRepository, KafkaOffsetRepository}
-import com.datamantra.cassandra.{CassandraConfig, CassandraDriver}
-import com.datamantra.spark.GracefulShutdown
+
 import com.datastax.spark.connector.cql.CassandraConnector
-import io.heyram.cassandra.dao.{CreditcardTransactionRepository, IntrusionDetectionRepository, KafkaOffsetRepository}
+import io.heyram.cassandra.dao.{IntrusionDetectionRepository, KafkaOffsetRepository}
 import io.heyram.cassandra.{CassandraConfig, CassandraDriver}
 import io.heyram.config.Config
 import io.heyram.anomaly.Schema
 import io.heyram.kafka.KafkaConfig
 import io.heyram.spark.{DataReader, GracefulShutdown, SparkConfig}
 import io.heyram.spark.jobs.SparkJob
-import io.heyram.utils.Utils
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.log4j.Logger
 import org.apache.spark.ml.PipelineModel

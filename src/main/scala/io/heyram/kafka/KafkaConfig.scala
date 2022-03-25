@@ -5,9 +5,7 @@ import org.apache.log4j.Logger
 
 import scala.collection.mutable.Map
 
-/**
- * Created by kafka on 21/5/18.
- */
+
 object KafkaConfig {
 
   val logger = Logger.getLogger(getClass.getName)

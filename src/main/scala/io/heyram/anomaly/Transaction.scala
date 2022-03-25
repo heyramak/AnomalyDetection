@@ -46,7 +46,8 @@ case class Transaction(id:String,
                        dst_host_serror_rate:Double,
                        dst_host_srv_serror_rate:Double,
                        dst_host_rerror_rate:Double,
-                       dst_host_srv_rerror_rate:Double)
+                       dst_host_srv_rerror_rate:Double
+                       xAttack:String)
 
 case class DstreamTransaction(trans_time:Timestamp,
                               duration:Double,

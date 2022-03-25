@@ -1,6 +1,6 @@
 package io.heyram.kafka
 
-import com.datamantra.creditcard.Schema
+
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.log4j.Logger
 import org.apache.spark.sql.{Dataset, SparkSession}
@@ -13,9 +13,6 @@ import io.heyram.anomaly.{Schema, TransactionKafka}
 import scala.collection.mutable.Map
 
 
-/**
- * Created by kafka on 16/5/18.
- */
 object KafkaSource {
 
   val logger = Logger.getLogger(getClass.getName)

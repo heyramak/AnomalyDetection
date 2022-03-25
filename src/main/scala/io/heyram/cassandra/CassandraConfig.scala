@@ -27,7 +27,7 @@ object CassandraConfig {
 
   /* Default Settings will be used when you run the project from Intellij */
   def defaultSettng() = {
-    keyspace = "intrusionDetection"
+    keyspace = "intrusiondetection"
     anomalyTable = "anomaly"
     normalTable = "normal"
     kafkaOffsetTable = "kafka_offset"

@@ -14,7 +14,6 @@ object IntrusionDetectionRepository {
   def cqlTransactionPrepare(db: String, table: String) = {
     s"""
      insert into $db.$table (
-       ${Enums.TransactionCassandra.trans_time}
        ${Enums.TransactionCassandra.duration},
        ${Enums.TransactionCassandra.protocol_type},
        ${Enums.TransactionCassandra.service},

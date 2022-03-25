@@ -7,6 +7,7 @@ import io.heyram.config.Config
 import io.heyram.anomaly.Schema
 import io.heyram.spark.{DataReader, SparkConfig}
 import org.apache.spark.sql.functions._
+import java.time
 import org.apache.spark.sql.types.{IntegerType, TimestampType}
 
 
@@ -18,7 +19,7 @@ object IntialImportToCassandra extends SparkJob("Initial Import to Cassandra"){
 
     import sparkSession.implicits._
 
-    val transactionDF = DataReader.read(SparkConfig.trainingDatasource, Schema.fruadCheckedTransactionSchema)
+    val transactionDF = DataReader.read("/home/hduser/project/AnomalyDetection/src/main/resources/data/KDDTrain+.csv", Schema.transactionSchema)
 
 
     val processedDF = transactionDF
@@ -31,15 +32,17 @@ object IntialImportToCassandra extends SparkJob("Initial Import to Cassandra"){
         "diff_srv_rate","srv_diff_host_rate","dst_host_count","dst_host_srv_count",
         "dst_host_same_srv_rate","dst_host_diff_srv_rate","dst_host_same_src_port_rate",
         "dst_host_srv_diff_host_rate","dst_host_serror_rate","dst_host_srv_serror_rate",
-        "dst_host_rerror_rate","dst_host_srv_rerror_rate","xAttack")
+        "dst_host_rerror_rate","dst_host_srv_rerror_rate","id")
+
+
 
     processedDF.cache()
 
-    val anomalyDF = processedDF.filter($"xAttack" === 1)
-    val normalDF = processedDF.filter($"xAttack" === 0)
+    val anomalyDF = processedDF.filter($"xAttack" =!= 4)
+    val normalDF = processedDF.filter($"xAttack" === 4)
 
     /* Save anomaly transaction data to anomaly cassandra table*/
-    anomalyDF.write
+    processedDF.write
       .format("org.apache.spark.sql.cassandra")
       .mode("append")
       .options(Map("keyspace" -> CassandraConfig.keyspace, "table" -> CassandraConfig.anomalyTable))
