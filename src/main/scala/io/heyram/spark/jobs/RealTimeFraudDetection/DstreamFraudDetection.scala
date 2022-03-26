@@ -13,6 +13,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.log4j.Logger
 import org.apache.spark.ml.PipelineModel
 import org.apache.spark.ml.classification.RandomForestClassificationModel
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.streaming.{Duration, StreamingContext}
 import org.apache.spark.streaming.kafka010.KafkaUtils
@@ -31,7 +32,11 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
     Config.parseArgs(args)
 
     import sparkSession.implicits._
-
+    SparkSession
+      .builder()
+      .appName("Real time anomaly detection")
+      .config("spark.master", "local")
+      .getOrCreate();
     /* Load Preprocessing Model and Random Forest Model saved by Spark ML Job i.e FraudDetectionTraining */
     val preprocessingModel = PipelineModel.load("/home/heyram/workspace/AnomalyDetection/src/main/resources/spark/training/PreprocessingModel")
     val randomForestModel = RandomForestClassificationModel.load("/home/heyram/workspace/AnomalyDetection/src/main/resources/spark/training/RandomForestModel")
