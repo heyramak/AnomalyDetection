@@ -11,7 +11,7 @@ import org.apache.spark.ml.Pipeline
 object FraudDetectionTraining extends SparkJob("Balancing Fraud & Non-Fraud Dataset"){
 
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
 
     Config.parseArgs(args)
 
@@ -39,7 +39,7 @@ object FraudDetectionTraining extends SparkJob("Balancing Fraud & Non-Fraud Data
         "diff_srv_rate","srv_diff_host_rate","dst_host_count","dst_host_srv_count",
         "dst_host_same_srv_rate","dst_host_diff_srv_rate","dst_host_same_src_port_rate",
         "dst_host_srv_diff_host_rate","dst_host_serror_rate","dst_host_srv_serror_rate",
-        "dst_host_rerror_rate","dst_host_srv_rerror_rate","xAttack")
+        "dst_host_rerror_rate","dst_host_srv_rerror_rate","xattack")
 
     val transactionDF = normalDF.union(anomalyDF)
     transactionDF.cache()
@@ -54,7 +54,7 @@ object FraudDetectionTraining extends SparkJob("Balancing Fraud & Non-Fraud Data
       "diff_srv_rate","srv_diff_host_rate","dst_host_count","dst_host_srv_count",
       "dst_host_same_srv_rate","dst_host_diff_srv_rate","dst_host_same_src_port_rate",
       "dst_host_srv_diff_host_rate","dst_host_serror_rate","dst_host_srv_serror_rate",
-      "dst_host_rerror_rate","dst_host_srv_rerror_rate","xAttack")
+      "dst_host_rerror_rate","dst_host_srv_rerror_rate","xattack")
 
     val pipelineStages = BuildPipeline.createFeaturePipeline(transactionDF.schema, coloumnNames)
     val pipeline = new Pipeline().setStages(pipelineStages)
@@ -65,11 +65,11 @@ object FraudDetectionTraining extends SparkJob("Balancing Fraud & Non-Fraud Data
 
 
     val fraudDF = featureDF
-      .filter($"xAttack" =!= 4)
-      .withColumnRenamed("xAttack", "label")
+      .filter($"xattack" =!= 5)
+      .withColumnRenamed("xattack", "label")
       .select("features", "label")
 
-    val nonFraudDF = featureDF.filter($"xAttack" === 4)
+    val nonFraudDF = featureDF.filter($"xattack" === 5)
     val fraudCount = fraudDF.count()
 
 

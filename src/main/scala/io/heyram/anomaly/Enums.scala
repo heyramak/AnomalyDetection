@@ -49,7 +49,7 @@ object  Enums {
     val dst_host_srv_serror_rate = "dst_host_srv_serror_rate"
     val dst_host_rerror_rate = "dst_host_rerror_rate"
     val dst_host_srv_rerror_rate = "dst_host_srv_rerror_rate"
-    val xAttack = "xAttack"
+    val xattack = "xattack"
     val kafka_partition = "partition"
     val kafka_offset = "offset"
 

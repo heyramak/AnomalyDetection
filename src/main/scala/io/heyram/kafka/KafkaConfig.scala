@@ -3,17 +3,18 @@ package io.heyram.kafka
 import io.heyram.config.Config
 import org.apache.log4j.Logger
 
-import scala.collection.mutable.Map
+import scala.collection.mutable
+
 
 
 object KafkaConfig {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
-  val kafkaParams: Map[String, String] = Map.empty
+  val kafkaParams: mutable.Map[String, String] = mutable.Map.empty
 
   /*Configuration setting are loaded from application.conf when you run Spark Standalone cluster*/
-  def load() = {
+  def load(): Option[String] = {
     logger.info("Loading Kafka Setttings")
     kafkaParams.put("topic", Config.applicationConf.getString("config.kafka.topic"))
     kafkaParams.put("enable.auto.commit", Config.applicationConf.getString("config.kafka.enable.auto.commit"))
@@ -23,7 +24,7 @@ object KafkaConfig {
   }
 
   /* Default Settings will be used when you run the project from Intellij */
-  def defaultSetting() = {
+  def defaultSetting(): Option[String] = {
 
     kafkaParams.put("topic", "intrusionDetection")
     kafkaParams.put("enable.auto.commit", "false")

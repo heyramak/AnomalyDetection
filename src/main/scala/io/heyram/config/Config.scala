@@ -9,7 +9,7 @@ import org.apache.log4j.Logger
 
 
 object Config {
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
   var applicationConf: Config = _
 
@@ -22,10 +22,10 @@ object Config {
    * @param args
    * @return
    */
-  def parseArgs(args: Array[String]) = {
+  def parseArgs(args: Array[String]): Unit = {
 
-    if(args.size == 0) {
-      defaultSettiing
+    if(args.length == 0) {
+      defaultSettiing()
     } else {
       applicationConf = ConfigFactory.parseFile(new File(args(0)))
       val runMode = applicationConf.getString("config.mode")
@@ -37,14 +37,14 @@ object Config {
 
   }
 
-  def loadConfig() = {
+  def loadConfig(): Unit = {
 
-    CassandraConfig.load
-    KafkaConfig.load
-    SparkConfig.load
+    CassandraConfig.load()
+    KafkaConfig.load()
+    SparkConfig.load()
   }
 
-  def defaultSettiing() = {
+  def defaultSettiing(): Unit = {
 
     CassandraConfig.defaultSettng()
     KafkaConfig.defaultSetting()

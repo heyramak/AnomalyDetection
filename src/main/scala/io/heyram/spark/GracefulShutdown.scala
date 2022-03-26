@@ -8,11 +8,11 @@ import org.apache.spark.streaming.StreamingContext
 
 object GracefulShutdown {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
   var stopFlag:Boolean = false
 
-  def checkShutdownMarker = {
+  def checkShutdownMarker(): Unit = {
     if (!stopFlag) {
       stopFlag =  new java.io.File(SparkConfig.shutdownMarker).exists()
     }
@@ -20,7 +20,7 @@ object GracefulShutdown {
   }
 
   /* Handle Structured Streaming graceful shutdown. */
-  def handleGracefulShutdown(checkIntervalMillis:Int, streamingQueries: List[StreamingQuery])(implicit sparkSession: SparkSession) {
+  def handleGracefulShutdown(checkIntervalMillis:Int, streamingQueries: List[StreamingQuery])(implicit sparkSession: SparkSession): Unit = {
 
     var isStopped = false
 
@@ -31,10 +31,10 @@ object GracefulShutdown {
         logger.info("confirmed! The streaming context is stopped. Exiting application...")
       else
         logger.info("Streaming App is still running. Timeout...")
-      checkShutdownMarker
+      checkShutdownMarker()
       if (!isStopped && stopFlag) {
         logger.info("stopping ssc right now")
-        streamingQueries.map(query => {
+        streamingQueries.foreach(query => {
           query.stop()
         })
         sparkSession.stop
@@ -45,7 +45,7 @@ object GracefulShutdown {
 
 
   /* Handle Dstream graceful shutdown. */
-  def handleGracefulShutdown(checkIntervalMillis:Int, ssc:StreamingContext)(implicit sparkSession: SparkSession)  {
+  def handleGracefulShutdown(checkIntervalMillis:Int, ssc:StreamingContext)(implicit sparkSession: SparkSession): Unit = {
 
     var isStopped = false
 
@@ -56,7 +56,7 @@ object GracefulShutdown {
         logger.info("confirmed! The streaming context is stopped. Exiting application...")
       else
         logger.info("Streaming App is still running. Timeout...")
-      checkShutdownMarker
+      checkShutdownMarker()
       if (!isStopped && stopFlag) {
         logger.info("stopping ssc right now")
         ssc.stop(true, true)

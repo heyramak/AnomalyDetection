@@ -1,26 +1,22 @@
 package io.heyram.cassandra
 
-import com.datastax.spark.connector.SomeColumns
 import com.datastax.spark.connector.cql.CassandraConnector
 import io.heyram.cassandra.foreachSink.CassandraSinkForeach
 import io.heyram.spark.SparkConfig
 import org.apache.kafka.common.TopicPartition
 import org.apache.log4j.Logger
-import org.apache.spark.SparkContext
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
-import org.apache.spark.streaming.kafka010.HasOffsetRanges
+import org.apache.spark.sql.streaming.StreamingQuery
 
 
 object CassandraDriver {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
-  val connector = CassandraConnector(SparkConfig.sparkConf)
+  val connector: CassandraConnector = CassandraConnector(SparkConfig.sparkConf)
 
 
-  def debugStream(ds: Dataset[_], mode: String = "append") = {
+  def debugStream(ds: Dataset[_], mode: String = "append"): StreamingQuery = {
 
     ds.writeStream
       .format("console")
@@ -31,7 +27,7 @@ object CassandraDriver {
   }
 
 
-  def saveForeach(df: DataFrame, db:String, table:String , queryName: String, mode:String) = {
+  def saveForeach(df: DataFrame, db:String, table:String , queryName: String, mode:String): StreamingQuery = {
 
     println("Calling saveForeach")
     df
@@ -44,9 +40,7 @@ object CassandraDriver {
 
 
   /* Read and prepare offset for Structrued Streaming */
-  def readOffset(keyspace:String, table:String)(implicit sparkSession:SparkSession) = {
-
-    import sparkSession.implicits._
+  def readOffset(keyspace:String, table:String)(implicit sparkSession:SparkSession): (String, String) = {
     val df = sparkSession
       .read
       .format("org.apache.spark.sql.cassandra")
@@ -75,7 +69,7 @@ object CassandraDriver {
    * @param array
    * @return {"topicA":{"0":23,"1":-1},"topicB":{"0":-2}}
    */
-  def transformKafkaMetadataArrayToJson(array: Array[Row]) = {
+  def transformKafkaMetadataArrayToJson(array: Array[Row]): String = {
 
     val partitionOffset = array
       .toList
@@ -83,11 +77,11 @@ object CassandraDriver {
         a + s""""${i.getAs[Int](("partition"))}":${i.getAs[Long](("offset"))}, """
       })
 
-    println("Offset: " + partitionOffset.substring(0, partitionOffset.size -2))
+    println("Offset: " + partitionOffset.substring(0, partitionOffset.length -2))
 
     val partitionAndOffset  = s"""{"anomalyDetection":
           {
-           ${partitionOffset.substring(0, partitionOffset.size -2)}
+           ${partitionOffset.substring(0, partitionOffset.length -2)}
           }
          }
       """.replaceAll("\n", "").replaceAll(" ", "")
@@ -98,9 +92,7 @@ object CassandraDriver {
 
 
   /* Read offsert from Cassandra for Dstream*/
-  def readOffset(keySpace:String, table:String, topic:String)(implicit sparkSession:SparkSession) = {
-
-    import sparkSession.implicits._
+  def readOffset(keySpace:String, table:String, topic:String)(implicit sparkSession:SparkSession): Option[Map[TopicPartition, Long]] = {
     val df = sparkSession
       .read
       .format("org.apache.spark.sql.cassandra")
@@ -126,9 +118,7 @@ object CassandraDriver {
 
 
   /* Save Offset to Cassandra for Structured Streaming */
-  def saveOffset(keySpace:String, table:String, df:DataFrame)(implicit sparkSession:SparkSession) = {
-
-    import sparkSession.implicits._
+  def saveOffset(keySpace:String, table:String, df:DataFrame)(implicit sparkSession:SparkSession): Unit = {
 
     df.write
      .format("org.apache.spark.sql.cassandra")

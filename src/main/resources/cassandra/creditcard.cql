@@ -7,7 +7,7 @@ USE intrusionDetection;
 
 CREATE TABLE IF NOT EXISTS normal
 (
-    id                          UUID,
+    id                          text,
     duration                    double,
     protocol_type               text,
     service                     text,
@@ -49,14 +49,14 @@ CREATE TABLE IF NOT EXISTS normal
     dst_host_srv_serror_rate    double,
     dst_host_rerror_rate        double,
     dst_host_srv_rerror_rate    double,
-    xAttack                     text
-    PRIMARY KEY (id)
+    xattack                     double,
+    primary key ( id )
 );
 
 
 CREATE TABLE IF NOT EXISTS anomaly
 (
-    id                          UUID,
+    id                          text,
     duration                    double,
     protocol_type               text,
     service                     text,
@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS anomaly
     dst_host_srv_serror_rate    double,
     dst_host_rerror_rate        double,
     dst_host_srv_rerror_rate    double,
-    xAttack                     text,
-    PRIMARY KEY (id)
+    xattack                     double,
+    primary key ( id )
 );
 
 

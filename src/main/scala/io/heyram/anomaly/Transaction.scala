@@ -5,7 +5,6 @@ import java.sql.Timestamp
 
 
 case class Transaction(id:String,
-                       trans_time:Timestamp,
                        duration:Double,
                        protocol_type:String,
                        service:String,
@@ -46,10 +45,10 @@ case class Transaction(id:String,
                        dst_host_serror_rate:Double,
                        dst_host_srv_serror_rate:Double,
                        dst_host_rerror_rate:Double,
-                       dst_host_srv_rerror_rate:Double
-                       xAttack:String)
+                       dst_host_srv_rerror_rate:Double,
+                       xattack:Double)
 
-case class DstreamTransaction(trans_time:Timestamp,
+case class DstreamTransaction(id:String,
                               duration:Double,
                               protocol_type:String,
                               service:String,
@@ -90,7 +89,8 @@ case class DstreamTransaction(trans_time:Timestamp,
                               dst_host_serror_rate:Double,
                               dst_host_srv_serror_rate:Double,
                               dst_host_rerror_rate:Double,
-                              dst_host_srv_rerror_rate:Double)
+                              dst_host_srv_rerror_rate:Double,
+                              xattack:Double)
 
 
 /* Spark Dataset case class for mapping messages received from Kafka in Structured Streaming*/

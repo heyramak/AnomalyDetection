@@ -1,7 +1,7 @@
 package io.heyram.cassandra.dao
 
-import java.sql.Timestamp
-import com.datastax.driver.core.PreparedStatement
+
+import com.datastax.driver.core.{BoundStatement, PreparedStatement}
 import io.heyram.anomaly.Enums
 import org.apache.log4j.Logger
 import org.apache.spark.sql.Row
@@ -9,9 +9,9 @@ import org.apache.spark.sql.Row
 
 object KafkaOffsetRepository {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
-  def cqlOffsetPrepare(db:String, table:String) = {
+  def cqlOffsetPrepare(db:String, table:String): String = {
     s"""
      insert into $db.$table (
        ${Enums.TransactionCassandra.kafka_partition},
@@ -22,7 +22,7 @@ object KafkaOffsetRepository {
         )"""
   }
 
-  def cqlOffsetBind(prepared: PreparedStatement, record:(Int, Long)) ={
+  def cqlOffsetBind(prepared: PreparedStatement, record:(Int, Long)): BoundStatement ={
     val bound = prepared.bind()
     bound.setInt(Enums.TransactionCassandra.kafka_partition,record._1)
     bound.setLong(Enums.TransactionCassandra.kafka_offset, record._2)

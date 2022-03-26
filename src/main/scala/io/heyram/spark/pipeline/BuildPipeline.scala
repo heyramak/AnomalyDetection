@@ -2,10 +2,7 @@ package io.heyram.spark.pipeline
 
 import org.apache.log4j.Logger
 import org.apache.spark.ml.PipelineStage
-import org.apache.spark.ml.classification.DecisionTreeClassifier
-import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.feature.{VectorAssembler, OneHotEncoder, StringIndexer}
-import org.apache.spark.ml.regression.DecisionTreeRegressor
 import org.apache.spark.sql.types.{NumericType, StringType, StructType}
 
 import scala.collection.mutable
@@ -13,9 +10,9 @@ import scala.collection.mutable
 
 object BuildPipeline {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
-  def createStringIndexer(columns:List[String]) = {
+  def createStringIndexer(columns:List[String]): Seq[StringIndexer] = {
     columns.map(column => {
           val stringIndexer = new StringIndexer()
           stringIndexer.setInputCol(column).setOutputCol(s"${column}_indexed")
@@ -23,7 +20,7 @@ object BuildPipeline {
     })
   }
 
-  def createOneHotEncoder(columns:List[String]) = {
+  def createOneHotEncoder(columns:List[String]): Seq[OneHotEncoder] = {
 
     columns.map(column => {
       val oneHotEncoder = new OneHotEncoder()

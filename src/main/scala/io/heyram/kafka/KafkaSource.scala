@@ -1,24 +1,20 @@
 package io.heyram.kafka
 
-
-import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.log4j.Logger
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import com.typesafe.config.ConfigFactory
-import io.heyram.config.Config
 import io.heyram.anomaly.{Schema, TransactionKafka}
 
-import scala.collection.mutable.Map
+
 
 
 object KafkaSource {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
   /* Read stream from Kafka using Structured Streaming */
-  def readStream(startingOption: String = "startingOffsets", partitionsAndOffsets: String = "earliest")(implicit sparkSession:SparkSession) = {
+  def readStream(startingOption: String = "startingOffsets", partitionsAndOffsets: String = "earliest")(implicit sparkSession:SparkSession): Dataset[TransactionKafka] = {
     logger.info("Reading from Kafka")
     //logger.info("partitionsAndOffsets: " + partitionsAndOffsets)
     import  sparkSession.implicits._

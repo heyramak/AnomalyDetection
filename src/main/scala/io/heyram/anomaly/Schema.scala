@@ -9,6 +9,7 @@ object Schema {
   val transactionStructureName = "transaction"
 
   val transactionSchema = new StructType()
+    .add(Enums.TransactionKafka.id, StringType, true)
     .add(Enums.TransactionKafka.duration, DoubleType, true)
     .add(Enums.TransactionKafka.protocol_type, StringType, true)
     .add(Enums.TransactionKafka.service, StringType, true)
@@ -50,11 +51,10 @@ object Schema {
     .add(Enums.TransactionKafka.dst_host_srv_serror_rate, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_rerror_rate, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_srv_rerror_rate, DoubleType, true)
-    .add(Enums.TransactionKafka.id, StringType, true)
-    .add(Enums.TransactionKafka.xAttack, StringType, true)
+    .add(Enums.TransactionKafka.xattack, DoubleType, true)
 
   /* Transaction  Schema used while importing transaction data to Cassandra*/
-  val fruadCheckedTransactionSchema = transactionSchema.add(Enums.TransactionKafka.xAttack, StringType, true)
+  val fruadCheckedTransactionSchema = transactionSchema.add(Enums.TransactionKafka.xattack, DoubleType, true)
 
 
   /* Schema of transaction msgs received from Kafka. Json msg is received from Kafka. Hence evey field is treated as String */
@@ -102,5 +102,6 @@ object Schema {
     .add(Enums.TransactionKafka.dst_host_srv_serror_rate, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_rerror_rate, DoubleType, true)
     .add(Enums.TransactionKafka.dst_host_srv_rerror_rate, DoubleType, true)
+    .add(Enums.TransactionKafka.xattack, DoubleType, true)
 
 }

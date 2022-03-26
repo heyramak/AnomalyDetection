@@ -65,7 +65,7 @@ object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming 
 
         val anomalyPredictionDF = predictionDF.filter($"xAttack" =!= 5)
 
-        val normalPredictionDF = predictionDF.filter($"is_fraud" === 5)
+        val normalPredictionDF = predictionDF.filter($"xAttack" === 5)
 
         /*Save anomaly transactions to fraud_transaction table*/
         val anomalyQuery = CassandraDriver.saveForeach(anomalyPredictionDF, CassandraConfig.keyspace, CassandraConfig.anomalyTable, "anomalyQuery", "append")

@@ -7,7 +7,7 @@ import org.apache.spark.ml.feature.{StringIndexerModel, OneHotEncoder, VectorAss
 object FeatureExtraction {
 
   def getFeatures(pipelineModel:PipelineModel):Array[String] = {
-    val vectorAssembler = pipelineModel.stages.filter(_.isInstanceOf[VectorAssembler]).headOption.getOrElse(throw new IllegalArgumentException("Invalid model")).asInstanceOf[VectorAssembler]
+    val vectorAssembler = pipelineModel.stages.find(_.isInstanceOf[VectorAssembler]).getOrElse(throw new IllegalArgumentException("Invalid model")).asInstanceOf[VectorAssembler]
     val featureNames = vectorAssembler.getInputCols
 
     featureNames.flatMap(featureName => {

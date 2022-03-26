@@ -6,7 +6,7 @@ import org.apache.log4j.Logger
 
 object CassandraConfig {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
   var keyspace:String = _
   var anomalyTable:String = _
@@ -15,7 +15,7 @@ object CassandraConfig {
   var cassandrHost:String = _
 
   /*Configuration setting are loaded from application.conf when you run Spark Standalone cluster*/
-  def load() = {
+  def load(): Unit = {
     logger.info("Loading Cassandra Setttings")
     keyspace = Config.applicationConf.getString("config.cassandra.keyspace")
     anomalyTable = Config.applicationConf.getString("config.cassandra.table.anomaly")
@@ -26,7 +26,7 @@ object CassandraConfig {
   }
 
   /* Default Settings will be used when you run the project from Intellij */
-  def defaultSettng() = {
+  def defaultSettng(): Unit = {
     keyspace = "intrusiondetection"
     anomalyTable = "anomaly"
     normalTable = "normal"

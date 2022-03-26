@@ -10,13 +10,13 @@ import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 
 object DataBalancing {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
   /*
   There will be more normal transaction then anomaly transaction. So non-fraud transactions must be balanced
   Kmeans Algorithm is used to balance normal transatiion.
   No. of normal transactions  are balanced(reduced) to no. of fraud transaction
    */
-  def createBalancedDataframe(df:DataFrame, reductionCount:Int)(implicit sparkSession:SparkSession) = {
+  def createBalancedDataframe(df:DataFrame, reductionCount:Int)(implicit sparkSession:SparkSession): DataFrame = {
 
     val kMeans = new KMeans().setK(reductionCount).setMaxIter(30)
     val kMeansModel = kMeans.fit(df)

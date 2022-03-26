@@ -210,7 +210,7 @@
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>
     <testSourceDirectory>src/test/scala</testSourceDirectory>
-    <finalName>fruaddetection-spark</finalName>
+    <finalName>anomalydetection-spark</finalName>
     <plugins>
       <plugin>
         <groupId>org.scala-tools</groupId>

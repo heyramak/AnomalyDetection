@@ -14,6 +14,7 @@ object IntrusionDetectionRepository {
   def cqlTransactionPrepare(db: String, table: String) = {
     s"""
      insert into $db.$table (
+       ${Enums.TransactionCassandra.id},
        ${Enums.TransactionCassandra.duration},
        ${Enums.TransactionCassandra.protocol_type},
        ${Enums.TransactionCassandra.service},
@@ -55,11 +56,11 @@ object IntrusionDetectionRepository {
        ${Enums.TransactionCassandra.dst_host_srv_serror_rate},
        ${Enums.TransactionCassandra.dst_host_rerror_rate},
        ${Enums.TransactionCassandra.dst_host_srv_rerror_rate},
-       ${Enums.TransactionCassandra.xAttack}
+       ${Enums.TransactionCassandra.xattack}
 
      )
      values(
-       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )"""
   }
@@ -67,7 +68,6 @@ object IntrusionDetectionRepository {
   def cqlTransactionBind(prepared: PreparedStatement, record: Row) = {
     val bound = prepared.bind()
     bound.setString(Enums.TransactionCassandra.id, record.getAs[String](Enums.TransactionCassandra.id))
-    bound.setTimestamp(Enums.TransactionCassandra.trans_time, record.getAs[Timestamp](Enums.TransactionCassandra.trans_time))
     bound.setDouble(Enums.TransactionCassandra.duration, record.getAs[Double](Enums.TransactionCassandra.duration))
     bound.setString(Enums.TransactionCassandra.protocol_type, record.getAs[String](Enums.TransactionCassandra.protocol_type))
     bound.setString(Enums.TransactionCassandra.service, record.getAs[String](Enums.TransactionCassandra.service))
@@ -109,15 +109,14 @@ object IntrusionDetectionRepository {
     bound.setDouble(Enums.TransactionCassandra.dst_host_srv_serror_rate, record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_serror_rate))
     bound.setDouble(Enums.TransactionCassandra.dst_host_rerror_rate, record.getAs[Double](Enums.TransactionCassandra.dst_host_rerror_rate))
     bound.setDouble(Enums.TransactionCassandra.dst_host_srv_rerror_rate, record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_rerror_rate))
-    bound.setDouble(Enums.TransactionCassandra.xAttack, record.getAs[Double](Enums.TransactionCassandra.xAttack))
+    bound.setDouble(Enums.TransactionCassandra.xattack, record.getAs[Double](Enums.TransactionCassandra.xattack))
 
   }
 
   def cqlTransaction(db: String, table: String, record: Row): String =
     s"""
      insert into $db.$table (
-       ${Enums.TransactionCassandra.id}
-       ${Enums.TransactionCassandra.trans_time}
+       ${Enums.TransactionCassandra.id},
        ${Enums.TransactionCassandra.duration},
        ${Enums.TransactionCassandra.protocol_type},
        ${Enums.TransactionCassandra.service},
@@ -159,11 +158,10 @@ object IntrusionDetectionRepository {
        ${Enums.TransactionCassandra.dst_host_srv_serror_rate},
        ${Enums.TransactionCassandra.dst_host_rerror_rate},
        ${Enums.TransactionCassandra.dst_host_srv_rerror_rate},
-       ${Enums.TransactionCassandra.xAttack}
+       ${Enums.TransactionCassandra.xattack}
      )
      values(
        '${record.getAs[String](Enums.TransactionCassandra.id)}',
-       '${record.getAs[Timestamp](Enums.TransactionCassandra.trans_time)}',
         ${record.getAs[Double](Enums.TransactionCassandra.duration)},
        '${record.getAs[String](Enums.TransactionCassandra.protocol_type)}',
        '${record.getAs[String](Enums.TransactionCassandra.service)}',
@@ -205,6 +203,6 @@ object IntrusionDetectionRepository {
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_serror_rate)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_rerror_rate)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_rerror_rate)},
-       '${record.getAs[String](Enums.TransactionCassandra.xAttack)}'
+       '${record.getAs[Double](Enums.TransactionCassandra.xattack)}'
         )"""
 }

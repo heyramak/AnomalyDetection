@@ -1,10 +1,8 @@
 package io.heyram.cassandra.foreachSink
 
-import java.sql.Timestamp
-import java.util.Date
+
 import io.heyram.cassandra.{CassandraConfig, CassandraDriver}
 import io.heyram.anomaly.Enums
-import org.apache.log4j.Logger
 import org.apache.spark.sql.{ForeachWriter, Row}
 
 
@@ -13,12 +11,12 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
 
   //val logger = Logger.getLogger(getClass.getName)
 
-  val db = dbName
-  val table = tableName
+  val db: String = dbName
+  val table: String = tableName
 
   private def cqlTransaction(record: Row): String = s"""
      insert into $db.$table (
-       ${Enums.TransactionCassandra.trans_time}
+       ${Enums.TransactionCassandra.id},
        ${Enums.TransactionCassandra.duration},
        ${Enums.TransactionCassandra.protocol_type},
        ${Enums.TransactionCassandra.service},
@@ -60,10 +58,10 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
        ${Enums.TransactionCassandra.dst_host_srv_serror_rate},
        ${Enums.TransactionCassandra.dst_host_rerror_rate},
        ${Enums.TransactionCassandra.dst_host_srv_rerror_rate},
-       ${Enums.TransactionCassandra.xAttack}
+       ${Enums.TransactionCassandra.xattack}
      )
      values(
-       '${record.getAs[Timestamp](Enums.TransactionCassandra.trans_time)}',
+       '${record.getAs[String](Enums.TransactionCassandra.id)}',
         ${record.getAs[Double](Enums.TransactionCassandra.duration)},
        '${record.getAs[String](Enums.TransactionCassandra.protocol_type)}',
        '${record.getAs[String](Enums.TransactionCassandra.service)}',
@@ -105,7 +103,7 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_serror_rate)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_rerror_rate)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_rerror_rate)},
-       '${record.getAs[String](Enums.TransactionCassandra.xAttack)}'
+       '${record.getAs[Double](Enums.TransactionCassandra.xattack)}'
         )"""
 
 
@@ -126,7 +124,7 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
   }
 
   //https://github.com/datastax/spark-cassandra-connector/blob/master/doc/1_connecting.md#connection-pooling
-  def process(record: Row) = {
+  def process(record: Row): Unit = {
     if (table == CassandraConfig.anomalyTable || table == CassandraConfig.normalTable) {
       println(s"Saving record: $record")
       CassandraDriver.connector.withSessionDo(session =>

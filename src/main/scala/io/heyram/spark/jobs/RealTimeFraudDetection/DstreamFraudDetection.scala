@@ -7,14 +7,13 @@ import io.heyram.cassandra.{CassandraConfig, CassandraDriver}
 import io.heyram.config.Config
 import io.heyram.anomaly.Schema
 import io.heyram.kafka.KafkaConfig
-import io.heyram.spark.{DataReader, GracefulShutdown, SparkConfig}
+import io.heyram.spark.{GracefulShutdown, SparkConfig}
 import io.heyram.spark.jobs.SparkJob
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.log4j.Logger
 import org.apache.spark.ml.PipelineModel
 import org.apache.spark.ml.classification.RandomForestClassificationModel
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{DoubleType, IntegerType, TimestampType}
 import org.apache.spark.streaming.{Duration, StreamingContext}
 import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
@@ -25,17 +24,17 @@ import scala.collection.mutable.Map
 
 object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream"){
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
-  def main (args: Array[String]){
+  def main (args: Array[String]): Unit = {
 
     Config.parseArgs(args)
 
     import sparkSession.implicits._
 
     /* Load Preprocessing Model and Random Forest Model saved by Spark ML Job i.e FraudDetectionTraining */
-    val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
-    val randomForestModel = RandomForestClassificationModel.load(SparkConfig.modelPath)
+    val preprocessingModel = PipelineModel.load("/home/heyram/workspace/AnomalyDetection/src/main/resources/spark/training/PreprocessingModel")
+    val randomForestModel = RandomForestClassificationModel.load("/home/heyram/workspace/AnomalyDetection/src/main/resources/spark/training/RandomForestModel")
 
     /*
        Connector Object is created in driver. It is serializable.
@@ -99,7 +98,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
 
         val featureTransactionDF = preprocessingModel.transform(kafkaTransactionDF)
         val predictionDF = randomForestModel.transform(featureTransactionDF)
-          .withColumnRenamed("prediction", "xAttack")
+          .withColumnRenamed("prediction", "xattack")
 
         /*
          Connector Object is created in driver. It is serializable.
@@ -135,12 +134,12 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
 
             val partitionOffset:Map[Int, Long] = Map.empty
             partitionOfRecords.foreach(record => {
-              val xAttack = record.getAs[Double]("xAttack")
-              if (xAttack != 5) {
+              val xattack = record.getAs[Double]("xattack")
+              if (xattack != 5.0) {
                 // Bind and execute prepared statement for Fraud Table
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementAnomaly, record))
               }
-              else if(xAttack == 5) {
+              else if(xattack == 5.0) {
                 // Bind and execute prepared statement for NonFraud Table
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementNormal, record))
               }
