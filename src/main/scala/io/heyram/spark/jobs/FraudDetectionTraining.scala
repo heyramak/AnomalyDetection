@@ -54,7 +54,7 @@ object FraudDetectionTraining extends SparkJob("Balancing Fraud & Non-Fraud Data
       "diff_srv_rate","srv_diff_host_rate","dst_host_count","dst_host_srv_count",
       "dst_host_same_srv_rate","dst_host_diff_srv_rate","dst_host_same_src_port_rate",
       "dst_host_srv_diff_host_rate","dst_host_serror_rate","dst_host_srv_serror_rate",
-      "dst_host_rerror_rate","dst_host_srv_rerror_rate","xattack")
+      "dst_host_rerror_rate","dst_host_srv_rerror_rate")
 
     val pipelineStages = BuildPipeline.createFeaturePipeline(transactionDF.schema, coloumnNames)
     val pipeline = new Pipeline().setStages(pipelineStages)

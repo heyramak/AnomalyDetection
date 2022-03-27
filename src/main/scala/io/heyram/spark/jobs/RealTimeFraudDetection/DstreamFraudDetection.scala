@@ -20,7 +20,8 @@ import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies._
 
-import scala.collection.mutable.Map
+import scala.collection.mutable
+
 
 
 object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream"){
@@ -47,7 +48,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
     */
     val connector = CassandraConnector(sparkSession.sparkContext.getConf)
 
-    val brodcastMap = sparkSession.sparkContext.broadcast(Map("keyspace" -> CassandraConfig.keyspace,
+    val brodcastMap = sparkSession.sparkContext.broadcast(mutable.Map("keyspace" -> CassandraConfig.keyspace,
       "anomalyTable" -> CassandraConfig.anomalyTable,
       "normalTable" -> CassandraConfig.normalTable,
       "kafkaOffsetTable" -> CassandraConfig.kafkaOffsetTable))
@@ -57,7 +58,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
 
 
     val topics = Set(KafkaConfig.kafkaParams("topic"))
-    val kafkaParams = Map[String, String](
+    val kafkaParams = mutable.Map[String, String](
       ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG -> KafkaConfig.kafkaParams("bootstrap.servers"),
       ConsumerConfig.GROUP_ID_CONFIG -> KafkaConfig.kafkaParams("group.id"),
       ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG ->
@@ -104,6 +105,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
         val featureTransactionDF = preprocessingModel.transform(kafkaTransactionDF)
         val predictionDF = randomForestModel.transform(featureTransactionDF)
           .withColumnRenamed("prediction", "xattack")
+        logger.info(predictionDF)
 
         /*
          Connector Object is created in driver. It is serializable.
@@ -137,7 +139,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
             val preparedStatementNormal = session.prepare(IntrusionDetectionRepository.cqlTransactionPrepare(keyspace, normalTable))
             val preparedStatementOffset = session.prepare(KafkaOffsetRepository.cqlOffsetPrepare(keyspace, kafkaOffsetTable))
 
-            val partitionOffset:Map[Int, Long] = Map.empty
+            val partitionOffset:mutable.Map[Int, Long] = mutable.Map.empty
             partitionOfRecords.foreach(record => {
               val xattack = record.getAs[Double]("xattack")
               if (xattack != 5.0) {

@@ -45,8 +45,8 @@ case class Transaction(id:String,
                        dst_host_serror_rate:Double,
                        dst_host_srv_serror_rate:Double,
                        dst_host_rerror_rate:Double,
-                       dst_host_srv_rerror_rate:Double,
-                       xattack:Double)
+                       dst_host_srv_rerror_rate:Double
+                       )
 
 case class DstreamTransaction(id:String,
                               duration:Double,
@@ -89,8 +89,8 @@ case class DstreamTransaction(id:String,
                               dst_host_serror_rate:Double,
                               dst_host_srv_serror_rate:Double,
                               dst_host_rerror_rate:Double,
-                              dst_host_srv_rerror_rate:Double,
-                              xattack:Double)
+                              dst_host_srv_rerror_rate:Double
+                              )
 
 
 /* Spark Dataset case class for mapping messages received from Kafka in Structured Streaming*/
