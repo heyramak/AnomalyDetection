@@ -11,6 +11,7 @@ import io.heyram.spark.{GracefulShutdown, SparkConfig}
 import io.heyram.spark.jobs.SparkJob
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.log4j.Logger
+import org.apache.spark.SparkConf
 import org.apache.spark.ml.PipelineModel
 import org.apache.spark.ml.classification.RandomForestClassificationModel
 import org.apache.spark.sql.SparkSession
@@ -28,19 +29,21 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
 
   val logger: Logger = Logger.getLogger(getClass.getName)
 
-  def main (args: Array[String]): Unit = {
+  def main (args: Array[String]) = {
 
     Config.parseArgs(args)
 
     import sparkSession.implicits._
+
     SparkSession
       .builder()
-      .appName("Real time anomaly detection")
+      .appName("Anomaly Detection using Dstream")
       .config("spark.master", "local")
       .getOrCreate();
+
     /* Load Preprocessing Model and Random Forest Model saved by Spark ML Job i.e FraudDetectionTraining */
-    val preprocessingModel = PipelineModel.load("/home/heyram/workspace/AnomalyDetection/src/main/resources/spark/training/PreprocessingModel")
-    val randomForestModel = RandomForestClassificationModel.load("/home/heyram/workspace/AnomalyDetection/src/main/resources/spark/training/RandomForestModel")
+    val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
+    val randomForestModel = RandomForestClassificationModel.load(SparkConfig.modelPath)
 
     /*
        Connector Object is created in driver. It is serializable.
@@ -97,6 +100,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
           .withColumn(Schema.kafkaTransactionStructureName, // nested structure with our json
             from_json($"transaction", Schema.kafkaTransactionSchema)) //From binary to JSON object
           .select("transaction.*", "partition", "offset")
+          .drop("id")
 
 
         sparkSession.sqlContext.sql("SET spark.sql.autoBroadcastJoinThreshold = 52428800")
@@ -105,7 +109,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
         val featureTransactionDF = preprocessingModel.transform(kafkaTransactionDF)
         val predictionDF = randomForestModel.transform(featureTransactionDF)
           .withColumnRenamed("prediction", "xattack")
-        logger.info(predictionDF)
+
 
         /*
          Connector Object is created in driver. It is serializable.
@@ -145,10 +149,12 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
               if (xattack != 5.0) {
                 // Bind and execute prepared statement for Fraud Table
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementAnomaly, record))
+                logger.info("Prepared statement for fraud table")
               }
               else if(xattack == 5.0) {
                 // Bind and execute prepared statement for NonFraud Table
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementNormal, record))
+                logger.info("Prepared statement for normal table")
               }
               //Get max offset in the current match
               val kafkaPartition = record.getAs[Int]("partition")

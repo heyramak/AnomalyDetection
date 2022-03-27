@@ -4,7 +4,8 @@ package io.heyram.spark.jobs
 import io.heyram.cassandra.CassandraConfig
 import io.heyram.config.Config
 import io.heyram.anomaly.Schema
-import io.heyram.spark.DataReader
+import io.heyram.spark.{DataReader, SparkConfig}
+
 
 
 
@@ -16,7 +17,7 @@ object IntialImportToCassandra extends SparkJob("Initial Import to Cassandra"){
 
     import sparkSession.implicits._
 
-    val transactionDF = DataReader.read("src/main/resources/data/KDDTrain+.csv", Schema.transactionSchema)
+    val transactionDF = DataReader.read(SparkConfig.trainingDatasource, Schema.transactionSchema)
 
 
     val processedDF = transactionDF

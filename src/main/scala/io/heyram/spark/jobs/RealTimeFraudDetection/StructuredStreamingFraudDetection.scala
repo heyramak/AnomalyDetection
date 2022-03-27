@@ -26,7 +26,7 @@ object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming 
     /*Offset is read from checkpointing, hence reading offset and saving offset to /from Cassandra is not required*/
     //val (startingOption, partitionsAndOffsets) = CassandraDriver.readOffset(CassandraConfig.keyspace, CassandraConfig.kafkaOffsetTable)
 
-    val rawStream = KafkaSource.readStream().q//(startingOption, partitionsAndOffsets)
+    val rawStream = KafkaSource.readStream()//(startingOption, partitionsAndOffsets)
 
     val transactionStream = rawStream
       .selectExpr("transaction.*", "partition", "offset")
