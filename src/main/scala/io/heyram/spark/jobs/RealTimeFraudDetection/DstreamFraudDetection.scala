@@ -11,7 +11,6 @@ import io.heyram.spark.{GracefulShutdown, SparkConfig}
 import io.heyram.spark.jobs.SparkJob
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.log4j.Logger
-import org.apache.spark.SparkConf
 import org.apache.spark.ml.PipelineModel
 import org.apache.spark.ml.classification.RandomForestClassificationModel
 import org.apache.spark.sql.SparkSession
@@ -29,7 +28,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
 
   val logger: Logger = Logger.getLogger(getClass.getName)
 
-  def main (args: Array[String]) = {
+  def main (args: Array[String]): Unit = {
 
     Config.parseArgs(args)
 
@@ -38,8 +37,8 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
     SparkSession
       .builder()
       .appName("Anomaly Detection using Dstream")
-      .config("spark.master", "local")
-      .getOrCreate();
+      .config("spark.master", "local[*]")
+      .getOrCreate()
 
     /* Load Preprocessing Model and Random Forest Model saved by Spark ML Job i.e FraudDetectionTraining */
     val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
@@ -76,18 +75,18 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
                            CassandraConfig.kafkaOffsetTable, KafkaConfig.kafkaParams("topic"))
 
     val stream = storedOffsets match {
-      case None => {
+      case None =>
         KafkaUtils.createDirectStream[String, String](ssc,
                        PreferConsistent,
                        Subscribe[String, String](topics, kafkaParams)
                        )
-      }
 
-      case Some(fromOffsets) => {
+
+      case Some(fromOffsets) =>
         KafkaUtils.createDirectStream[String, String](ssc,
                        PreferConsistent,
                        Assign[String, String](fromOffsets.keys.toList, kafkaParams, fromOffsets))
-      }
+
     }
 
     val transactionStream =  stream.map(cr => (cr.value(), cr.partition(), cr.offset()))
@@ -100,7 +99,8 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
           .withColumn(Schema.kafkaTransactionStructureName, // nested structure with our json
             from_json($"transaction", Schema.kafkaTransactionSchema)) //From binary to JSON object
           .select("transaction.*", "partition", "offset")
-          .drop("id")
+        kafkaTransactionDF.printSchema()
+        kafkaTransactionDF.show
 
 
         sparkSession.sqlContext.sql("SET spark.sql.autoBroadcastJoinThreshold = 52428800")
@@ -161,10 +161,10 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
               val offset = record.getAs[Long]("offset")
               partitionOffset.get(kafkaPartition) match  {
                 case None => partitionOffset.put(kafkaPartition, offset)
-                case Some(currentMaxOffset) => {
+                case Some(currentMaxOffset) =>
                   if(offset > currentMaxOffset)
                     partitionOffset.update(kafkaPartition, offset)
-                }
+
 
               }
 

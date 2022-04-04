@@ -26,7 +26,7 @@ object KafkaConfig {
   /* Default Settings will be used when you run the project from Intellij */
   def defaultSetting(): Option[String] = {
 
-    kafkaParams.put("topic", "intrusionDetection")
+    kafkaParams.put("topic", "intrusiondetection")
     kafkaParams.put("enable.auto.commit", "false")
     kafkaParams.put("group.id", "RealTime Intrusion Detection")
     kafkaParams.put("bootstrap.servers", "localhost:9092")

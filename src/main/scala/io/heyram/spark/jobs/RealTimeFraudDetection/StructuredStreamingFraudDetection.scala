@@ -10,6 +10,7 @@ import org.apache.spark.ml.PipelineModel
 import org.apache.spark.ml.classification.RandomForestClassificationModel
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
+import org.apache.spark.streaming.{Duration, StreamingContext}
 
 
 object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming Job to detect fraud transaction"){
@@ -20,7 +21,7 @@ object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming 
 
     Config.parseArgs(args)
     import sparkSession.implicits._
-
+    val ssc = new StreamingContext(sparkSession.sparkContext, Duration(SparkConfig.batchInterval))
 
 
     /*Offset is read from checkpointing, hence reading offset and saving offset to /from Cassandra is not required*/
@@ -29,7 +30,9 @@ object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming 
     val rawStream = KafkaSource.readStream()//(startingOption, partitionsAndOffsets)
 
     val transactionStream = rawStream
-      .selectExpr("transaction.*", "partition", "offset")
+      .selectExpr("transaction.*")
+    transactionStream.printSchema()
+
 
 
 
@@ -43,7 +46,7 @@ object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming 
         $"diff_srv_rate",$"srv_diff_host_rate",$"dst_host_count",$"dst_host_srv_count",
         $"dst_host_same_srv_rate",$"dst_host_diff_srv_rate",$"dst_host_same_src_port_rate",
         $"dst_host_srv_diff_host_rate",$"dst_host_serror_rate",$"dst_host_srv_serror_rate",
-        $"dst_host_rerror_rate",$"dst_host_srv_rerror_rate", $"partition", $"offset")
+        $"dst_host_rerror_rate",$"dst_host_srv_rerror_rate")
 
 
         val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
@@ -54,10 +57,10 @@ object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming 
         //predictionDF.cache
 
         val anomalyPredictionDF = predictionDF.filter($"prediction" =!= 5)
-        anomalyPredictionDF.withColumn("id", monotonically_increasing_id())
+
 
         val normalPredictionDF = predictionDF.filter($"prediction" === 5)
-        normalPredictionDF.withColumn("id", monotonically_increasing_id())
+
 
 
         /*Save anomaly transactions to fraud_transaction table*/
@@ -70,7 +73,7 @@ object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming 
         /*val kafkaOffsetDF = predictionDF.select("partition", "offset").groupBy("partition").agg(max("offset") as "offset")
         val offsetQuery = CassandraDriver.saveForeach(kafkaOffsetDF, CassandraConfig.keyspace, CassandraConfig.kafkaOffsetTable, "offsetQuery", "update")*/
 
-        GracefulShutdown.handleGracefulShutdown(1000, List(anomalyQuery, normalQuery))
+        GracefulShutdown.handleGracefulShutdown(1000,  List(anomalyQuery, normalQuery))
 
   }
 }

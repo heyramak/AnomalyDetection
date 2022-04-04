@@ -1,9 +1,9 @@
-CREATE KEYSPACE IF NOT EXISTS intrusionDetection
+CREATE KEYSPACE IF NOT EXISTS intrusiondetection
     WITH replication = {
         'class': 'SimpleStrategy', 'replication_factor': 1
         };
 
-USE intrusionDetection;
+USE intrusiondetection;
 
 CREATE TABLE IF NOT EXISTS normal
 (

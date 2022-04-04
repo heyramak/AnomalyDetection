@@ -1,7 +1,7 @@
 package io.heyram.cassandra.dao
 
-import java.sql.Timestamp
-import com.datastax.driver.core.PreparedStatement
+
+import com.datastax.driver.core.{BoundStatement, PreparedStatement}
 import io.heyram.anomaly.Enums
 import org.apache.log4j.Logger
 import org.apache.spark.sql.Row
@@ -9,9 +9,9 @@ import org.apache.spark.sql.Row
 
 object IntrusionDetectionRepository {
 
-  val logger = Logger.getLogger(getClass.getName)
+  val logger: Logger = Logger.getLogger(getClass.getName)
 
-  def cqlTransactionPrepare(db: String, table: String) = {
+  def cqlTransactionPrepare(db: String, table: String): String = {
     s"""
      insert into $db.$table (
        ${Enums.TransactionCassandra.id},
@@ -61,11 +61,11 @@ object IntrusionDetectionRepository {
      )
      values(
        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?
         )"""
   }
 
-  def cqlTransactionBind(prepared: PreparedStatement, record: Row) = {
+  def cqlTransactionBind(prepared: PreparedStatement, record: Row): BoundStatement = {
     val bound = prepared.bind()
     bound.setString(Enums.TransactionCassandra.id, record.getAs[String](Enums.TransactionCassandra.id))
     bound.setDouble(Enums.TransactionCassandra.duration, record.getAs[Double](Enums.TransactionCassandra.duration))
