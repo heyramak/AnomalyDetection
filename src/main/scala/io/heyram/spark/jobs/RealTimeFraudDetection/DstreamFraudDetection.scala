@@ -15,10 +15,12 @@ import org.apache.spark.ml.PipelineModel
 import org.apache.spark.ml.classification.RandomForestClassificationModel
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.DoubleType
 import org.apache.spark.streaming.{Duration, StreamingContext}
 import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies._
+
 
 import scala.collection.mutable
 
@@ -99,6 +101,51 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
           .withColumn(Schema.kafkaTransactionStructureName, // nested structure with our json
             from_json($"transaction", Schema.kafkaTransactionSchema)) //From binary to JSON object
           .select("transaction.*", "partition", "offset")
+          .withColumn("duration", lit($"duration") cast DoubleType)
+          .withColumn("protocol_type", lit($"protocol_type") cast DoubleType)
+          .withColumn("service", lit($"service") cast DoubleType)
+          .withColumn("flag", lit($"flag") cast DoubleType)
+          .withColumn("src_bytes", lit($"src_bytes") cast DoubleType)
+          .withColumn("dst_bytes", lit($"dst_bytes") cast DoubleType)
+          .withColumn("land", lit($"land") cast DoubleType)
+          .withColumn("wrong_fragment", lit($"wrong_fragment") cast DoubleType)
+          .withColumn("urgent", lit($"urgent") cast DoubleType)
+          .withColumn("hot", lit($"hot") cast DoubleType)
+          .withColumn("num_failed_logins", lit($"num_failed_logins") cast DoubleType)
+          .withColumn("logged_in",lit($"logged_in") cast DoubleType)
+          .withColumn("num_compromised", lit($"num_compromised") cast DoubleType)
+          .withColumn("root_shell", lit($"root_shell") cast DoubleType)
+          .withColumn("su_attempted", lit($"su_attempted") cast DoubleType)
+          .withColumn("num_root", lit($"num_root") cast DoubleType)
+          .withColumn("num_file_creations", lit($"num_file_creations") cast DoubleType)
+          .withColumn("num_shells", lit($"num_shells") cast DoubleType)
+          .withColumn("num_access_files", lit($"num_access_files") cast DoubleType)
+          .withColumn("num_outbound_cmds", lit($"num_outbound_cmds") cast DoubleType)
+          .withColumn("is_host_login", lit($"is_host_login") cast DoubleType)
+          .withColumn("is_guest_login", lit($"is_guest_login") cast DoubleType)
+          .withColumn("count", lit($"count") cast DoubleType)
+          .withColumn("srv_count", lit($"srv_count") cast DoubleType)
+          .withColumn("serror_rate", lit($"serror_rate") cast DoubleType)
+          .withColumn("srv_serror_rate", lit($"srv_serror_rate") cast DoubleType)
+          .withColumn("rerror_rate", lit($"rerror_rate") cast DoubleType)
+          .withColumn("srv_rerror_rate", lit($"srv_rerror_rate") cast DoubleType)
+          .withColumn("same_srv_rate", lit($"same_srv_rate") cast DoubleType)
+          .withColumn("diff_srv_rate", lit($"diff_srv_rate") cast DoubleType)
+          .withColumn("srv_diff_host_rate", lit($"srv_diff_host_rate") cast DoubleType)
+          .withColumn("dst_host_count", lit($"dst_host_count") cast DoubleType)
+          .withColumn("dst_host_srv_count", lit($"dst_host_srv_count") cast DoubleType)
+          .withColumn("dst_host_same_srv_rate", lit($"dst_host_same_srv_rate") cast DoubleType)
+          .withColumn("dst_host_diff_srv_rate", lit($"dst_host_diff_srv_rate") cast DoubleType)
+          .withColumn("dst_host_same_src_port_rate", lit($"dst_host_same_src_port_rate") cast DoubleType)
+          .withColumn("dst_host_srv_diff_host_rate", lit($"dst_host_srv_diff_host_rate") cast DoubleType)
+          .withColumn("dst_host_serror_rate", lit($"dst_host_serror_rate") cast DoubleType)
+          .withColumn("dst_host_srv_serror_rate", lit($"dst_host_srv_serror_rate") cast DoubleType)
+          .withColumn("dst_host_rerror_rate", lit($"dst_host_rerror_rate") cast DoubleType)
+          .withColumn("dst_host_srv_rerror_rate", lit($"dst_host_srv_rerror_rate") cast DoubleType)
+
+
+
+
         kafkaTransactionDF.printSchema()
         kafkaTransactionDF.show
 
@@ -109,6 +156,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
         val featureTransactionDF = preprocessingModel.transform(kafkaTransactionDF)
         val predictionDF = randomForestModel.transform(featureTransactionDF)
           .withColumnRenamed("prediction", "xattack")
+        logger.info("Crossed modelling phase")
 
 
         /*
@@ -145,9 +193,12 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
 
             val partitionOffset:mutable.Map[Int, Long] = mutable.Map.empty
             partitionOfRecords.foreach(record => {
+              logger.info("Prepare Statement for all three tables ")
               val xattack = record.getAs[Double]("xattack")
+              logger.info("Crossed")
               if (xattack != 5.0) {
                 // Bind and execute prepared statement for Fraud Table
+                logger.info("if statement triggered")
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementAnomaly, record))
                 logger.info("Prepared statement for fraud table")
               }

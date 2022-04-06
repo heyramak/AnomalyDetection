@@ -69,9 +69,9 @@ object IntrusionDetectionRepository {
     val bound = prepared.bind()
     bound.setString(Enums.TransactionCassandra.id, record.getAs[String](Enums.TransactionCassandra.id))
     bound.setDouble(Enums.TransactionCassandra.duration, record.getAs[Double](Enums.TransactionCassandra.duration))
-    bound.setString(Enums.TransactionCassandra.protocol_type, record.getAs[String](Enums.TransactionCassandra.protocol_type))
-    bound.setString(Enums.TransactionCassandra.service, record.getAs[String](Enums.TransactionCassandra.service))
-    bound.setString(Enums.TransactionCassandra.flag, record.getAs[String](Enums.TransactionCassandra.flag))
+    bound.setDouble(Enums.TransactionCassandra.protocol_type, record.getAs[Double](Enums.TransactionCassandra.protocol_type))
+    bound.setDouble(Enums.TransactionCassandra.service, record.getAs[Double](Enums.TransactionCassandra.service))
+    bound.setDouble(Enums.TransactionCassandra.flag, record.getAs[Double](Enums.TransactionCassandra.flag))
     bound.setDouble(Enums.TransactionCassandra.src_bytes, record.getAs[Double](Enums.TransactionCassandra.src_bytes))
     bound.setDouble(Enums.TransactionCassandra.dst_bytes, record.getAs[Double](Enums.TransactionCassandra.dst_bytes))
     bound.setDouble(Enums.TransactionCassandra.land, record.getAs[Double](Enums.TransactionCassandra.land))
@@ -163,9 +163,9 @@ object IntrusionDetectionRepository {
      values(
        '${record.getAs[String](Enums.TransactionCassandra.id)}',
         ${record.getAs[Double](Enums.TransactionCassandra.duration)},
-       '${record.getAs[String](Enums.TransactionCassandra.protocol_type)}',
-       '${record.getAs[String](Enums.TransactionCassandra.service)}',
-       '${record.getAs[String](Enums.TransactionCassandra.flag)}',
+       '${record.getAs[Double](Enums.TransactionCassandra.protocol_type)}',
+       '${record.getAs[Double](Enums.TransactionCassandra.service)}',
+       '${record.getAs[Double](Enums.TransactionCassandra.flag)}',
         ${record.getAs[Double](Enums.TransactionCassandra.src_bytes)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_bytes)},
         ${record.getAs[Double](Enums.TransactionCassandra.land)},

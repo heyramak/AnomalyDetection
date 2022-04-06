@@ -63,9 +63,9 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
      values(
        '${record.getAs[String](Enums.TransactionCassandra.id)}',
         ${record.getAs[Double](Enums.TransactionCassandra.duration)},
-       '${record.getAs[String](Enums.TransactionCassandra.protocol_type)}',
-       '${record.getAs[String](Enums.TransactionCassandra.service)}',
-       '${record.getAs[String](Enums.TransactionCassandra.flag)}',
+       '${record.getAs[Double](Enums.TransactionCassandra.protocol_type)}',
+       '${record.getAs[Double](Enums.TransactionCassandra.service)}',
+       '${record.getAs[Double](Enums.TransactionCassandra.flag)}',
         ${record.getAs[Double](Enums.TransactionCassandra.src_bytes)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_bytes)},
         ${record.getAs[Double](Enums.TransactionCassandra.land)},
