@@ -59,7 +59,7 @@ object GracefulShutdown {
       checkShutdownMarker()
       if (!isStopped && stopFlag) {
         logger.info("stopping ssc right now")
-        ssc.stop(true, true)
+        ssc.stop(stopSparkContext = true, stopGracefully = true)
         sparkSession.stop
         logger.info("ssc is stopped!!!!!!!")
       }

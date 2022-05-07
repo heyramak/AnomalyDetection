@@ -94,7 +94,7 @@ object StructuredStreamingFraudDetection extends SparkJob("Structured Streaming 
         val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
         val featureTransactionDF = preprocessingModel.transform(processedTransactionDF)
 
-        val randomForestModel = RandomForestClassificationModel.load(SparkConfig.modelPath)
+        val randomForestModel = RandomForestClassificationModel.load(SparkConfig.randomForestModelPath)
         val predictionDF =  randomForestModel.transform(featureTransactionDF)
         //predictionDF.cache
 predictionDF.printSchema()

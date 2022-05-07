@@ -12,7 +12,8 @@ object SparkConfig {
    val sparkConf = new SparkConf
 
    var trainingDatasource:String = _
-   var modelPath:String = _
+   var randomForestModelPath:String = _
+   var naiveBayesModelPath:String= _
    var preprocessingModelPath:String = _
    var shutdownMarker:String = _
    var batchInterval:Int = _
@@ -26,7 +27,8 @@ object SparkConfig {
       shutdownMarker = Config.applicationConf.getString("config.spark.shutdownPath")
       batchInterval = Config.applicationConf.getString("config.spark.batch.interval").toInt
       trainingDatasource = Config.localProjectDir + Config.applicationConf.getString("config.spark.training.datasource")
-      modelPath = Config.localProjectDir + Config.applicationConf.getString("config.spark.model.path")
+      randomForestModelPath = Config.localProjectDir + Config.applicationConf.getString("config.spark.model.random-forest.path")
+      naiveBayesModelPath = Config.localProjectDir + Config.applicationConf.getString("config.spark.model.naive-bayes.path")
       preprocessingModelPath = Config.localProjectDir + Config.applicationConf.getString("config.spark.model.preprocessing.path")
     }
 
@@ -36,7 +38,8 @@ object SparkConfig {
         .set("spark.sql.streaming.checkpointLocation", "/tmp/checkpoint")
       shutdownMarker = "/tmp/shutdownmarker"
       trainingDatasource ="src/main/resources/data/KDDTrain+.csv"
-      modelPath = "src/main/resources/spark/training/RandomForestModel"
+      randomForestModelPath = "src/main/resources/spark/training/RandomForestModel"
+      naiveBayesModelPath = "src/main/resources/spark/training/NaiveBayesModel"
       preprocessingModelPath = "src/main/resources/spark/training/PreprocessingModel"
       batchInterval = 5000
 

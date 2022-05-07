@@ -9,7 +9,7 @@ import java.util.Properties
 import scala.collection.JavaConverters._
 object consumer extends App {
   val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
-  val randomForestModel = RandomForestClassificationModel.load(SparkConfig.modelPath)
+  val randomForestModel = RandomForestClassificationModel.load(SparkConfig.randomForestModelPath)
   val props:Properties = new Properties()
   props.put("group.id", "test")
   props.put("bootstrap.servers","localhost:9092")

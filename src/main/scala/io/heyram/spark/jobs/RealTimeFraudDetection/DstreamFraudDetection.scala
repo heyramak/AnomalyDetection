@@ -44,7 +44,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
 
     /* Load Preprocessing Model and Random Forest Model saved by Spark ML Job i.e FraudDetectionTraining */
     val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
-    val randomForestModel = RandomForestClassificationModel.load(SparkConfig.modelPath)
+    val randomForestModel = RandomForestClassificationModel.load(SparkConfig.randomForestModelPath)
 
     /*
        Connector Object is created in driver. It is serializable.
