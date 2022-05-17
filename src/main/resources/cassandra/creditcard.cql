@@ -8,10 +8,11 @@ USE intrusiondetection;
 CREATE TABLE IF NOT EXISTS normal
 (
     id                          text,
+    trans_time                  timestamp,
     duration                    double,
-    protocol_type               double,
-    service                     double,
-    flag                        double,
+    protocol_type               text,
+    service                     text,
+    flag                        text,
     src_bytes                   double,
     dst_bytes                   double,
     land                        double,
@@ -50,17 +51,18 @@ CREATE TABLE IF NOT EXISTS normal
     dst_host_rerror_rate        double,
     dst_host_srv_rerror_rate    double,
     xattack                     double,
-    primary key ( id )
-);
+    PRIMARY KEY( id, trans_time )
+)WITH CLUSTERING ORDER BY (trans_time DESC);
 
 
 CREATE TABLE IF NOT EXISTS anomaly
 (
     id                          text,
+    trans_time                  timestamp,
     duration                    double,
-    protocol_type               double,
-    service                     double,
-    flag                        double,
+    protocol_type               text,
+    service                     text,
+    flag                        text,
     src_bytes                   double,
     dst_bytes                   double,
     land                        double,
@@ -99,8 +101,8 @@ CREATE TABLE IF NOT EXISTS anomaly
     dst_host_rerror_rate        double,
     dst_host_srv_rerror_rate    double,
     xattack                     double,
-    primary key ( id )
-);
+    PRIMARY KEY( id, trans_time )
+)WITH CLUSTERING ORDER BY (trans_time DESC);
 
 
 

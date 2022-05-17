@@ -37,7 +37,7 @@ object SparkConfig {
         .set("spark.cassandra.connection.host", CassandraConfig.cassandrHost)
         .set("spark.sql.streaming.checkpointLocation", "/tmp/checkpoint")
       shutdownMarker = "/tmp/shutdownmarker"
-      trainingDatasource ="src/main/resources/data/KDDTrain+.csv"
+      trainingDatasource ="src/main/resources/data/Train.csv"
       randomForestModelPath = "src/main/resources/spark/training/RandomForestModel"
       naiveBayesModelPath = "src/main/resources/spark/training/NaiveBayesModel"
       preprocessingModelPath = "src/main/resources/spark/training/PreprocessingModel"

@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.StringIndexerModel","timestamp":1652452043517,"sparkVersion":"2.2.1","uid":"strIdx_8504f047256f","paramMap":{"inputCol":"service","handleInvalid":"error","outputCol":"service_indexed"}}

@@ -5,6 +5,7 @@ import java.sql.Timestamp
 
 
 case class Transaction(id:String,
+                       trans_time: Timestamp,
                        duration:String,
                        protocol_type:String,
                        service:String,
@@ -49,10 +50,11 @@ case class Transaction(id:String,
                        )
 
 case class DstreamTransaction(id:String,
+                              trans_time: Timestamp,
                               duration:Double,
-                              protocol_type:Double,
-                              service:Double,
-                              flag:Double,
+                              protocol_type:String,
+                              service:String,
+                              flag:String,
                               src_bytes:Double,
                               dst_bytes:Double,
                               land:Double,

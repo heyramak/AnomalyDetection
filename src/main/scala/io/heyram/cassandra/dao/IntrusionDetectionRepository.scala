@@ -5,7 +5,7 @@ import com.datastax.driver.core.{BoundStatement, PreparedStatement}
 import io.heyram.anomaly.Enums
 import org.apache.log4j.Logger
 import org.apache.spark.sql.Row
-
+import java.sql.Timestamp
 
 object IntrusionDetectionRepository {
 
@@ -15,6 +15,7 @@ object IntrusionDetectionRepository {
     s"""
      insert into $db.$table (
        ${Enums.TransactionCassandra.id},
+       ${Enums.TransactionCassandra.trans_time},
        ${Enums.TransactionCassandra.duration},
        ${Enums.TransactionCassandra.protocol_type},
        ${Enums.TransactionCassandra.service},
@@ -61,17 +62,18 @@ object IntrusionDetectionRepository {
      )
      values(
        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?
+       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?
         )"""
   }
 
   def cqlTransactionBind(prepared: PreparedStatement, record: Row): BoundStatement = {
     val bound = prepared.bind()
     bound.setString(Enums.TransactionCassandra.id, record.getAs[String](Enums.TransactionCassandra.id))
+    bound.setTimestamp(Enums.TransactionCassandra.trans_time, record.getAs[Timestamp](Enums.TransactionCassandra.trans_time))
     bound.setDouble(Enums.TransactionCassandra.duration, record.getAs[Double](Enums.TransactionCassandra.duration))
-    bound.setDouble(Enums.TransactionCassandra.protocol_type, record.getAs[Double](Enums.TransactionCassandra.protocol_type))
-    bound.setDouble(Enums.TransactionCassandra.service, record.getAs[Double](Enums.TransactionCassandra.service))
-    bound.setDouble(Enums.TransactionCassandra.flag, record.getAs[Double](Enums.TransactionCassandra.flag))
+    bound.setString(Enums.TransactionCassandra.protocol_type, record.getAs[String](Enums.TransactionCassandra.protocol_type))
+    bound.setString(Enums.TransactionCassandra.service, record.getAs[String](Enums.TransactionCassandra.service))
+    bound.setString(Enums.TransactionCassandra.flag, record.getAs[String](Enums.TransactionCassandra.flag))
     bound.setDouble(Enums.TransactionCassandra.src_bytes, record.getAs[Double](Enums.TransactionCassandra.src_bytes))
     bound.setDouble(Enums.TransactionCassandra.dst_bytes, record.getAs[Double](Enums.TransactionCassandra.dst_bytes))
     bound.setDouble(Enums.TransactionCassandra.land, record.getAs[Double](Enums.TransactionCassandra.land))
@@ -117,6 +119,7 @@ object IntrusionDetectionRepository {
     s"""
      insert into $db.$table (
        ${Enums.TransactionCassandra.id},
+       ${Enums.TransactionCassandra.trans_time},
        ${Enums.TransactionCassandra.duration},
        ${Enums.TransactionCassandra.protocol_type},
        ${Enums.TransactionCassandra.service},
@@ -162,10 +165,11 @@ object IntrusionDetectionRepository {
      )
      values(
        '${record.getAs[String](Enums.TransactionCassandra.id)}',
+       '${record.getAs[Timestamp](Enums.TransactionCassandra.trans_time)}',
         ${record.getAs[Double](Enums.TransactionCassandra.duration)},
-       '${record.getAs[Double](Enums.TransactionCassandra.protocol_type)}',
-       '${record.getAs[Double](Enums.TransactionCassandra.service)}',
-       '${record.getAs[Double](Enums.TransactionCassandra.flag)}',
+       '${record.getAs[String](Enums.TransactionCassandra.protocol_type)}',
+       '${record.getAs[String](Enums.TransactionCassandra.service)}',
+       '${record.getAs[String](Enums.TransactionCassandra.flag)}',
         ${record.getAs[Double](Enums.TransactionCassandra.src_bytes)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_bytes)},
         ${record.getAs[Double](Enums.TransactionCassandra.land)},

@@ -8,6 +8,7 @@ object  Enums {
   object TransactionKafka extends Enumeration {
 
     val id = "id"
+    val trans_time = "trans_time"
     val duration = "duration"
     val protocol_type = "protocol_type"
     val service = "service"

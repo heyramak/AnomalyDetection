@@ -4,7 +4,7 @@ package io.heyram.cassandra.foreachSink
 import io.heyram.cassandra.{CassandraConfig, CassandraDriver}
 import io.heyram.anomaly.Enums
 import org.apache.spark.sql.{ForeachWriter, Row}
-
+import java.sql.Timestamp
 
 
 class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWriter[Row] {
@@ -17,6 +17,7 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
   private def cqlTransaction(record: Row): String = s"""
      insert into $db.$table (
        ${Enums.TransactionCassandra.id},
+       ${Enums.TransactionCassandra.trans_time},
        ${Enums.TransactionCassandra.duration},
        ${Enums.TransactionCassandra.protocol_type},
        ${Enums.TransactionCassandra.service},
@@ -62,10 +63,11 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
      )
      values(
        '${record.getAs[String](Enums.TransactionCassandra.id)}',
+       '${record.getAs[Timestamp](Enums.TransactionCassandra.trans_time)}',
         ${record.getAs[Double](Enums.TransactionCassandra.duration)},
-       '${record.getAs[Double](Enums.TransactionCassandra.protocol_type)}',
-       '${record.getAs[Double](Enums.TransactionCassandra.service)}',
-       '${record.getAs[Double](Enums.TransactionCassandra.flag)}',
+       '${record.getAs[String](Enums.TransactionCassandra.protocol_type)}',
+       '${record.getAs[String](Enums.TransactionCassandra.service)}',
+       '${record.getAs[String](Enums.TransactionCassandra.flag)}',
         ${record.getAs[Double](Enums.TransactionCassandra.src_bytes)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_bytes)},
         ${record.getAs[Double](Enums.TransactionCassandra.land)},

@@ -65,11 +65,11 @@ object FraudDetectionTraining extends SparkJob("Balancing Fraud & Non-Fraud Data
 
 
     val fraudDF = featureDF
-      .filter($"xattack" =!= 5.0)
+      .filter($"xattack" =!= 0.0)
       .withColumnRenamed("xattack", "label")
       .select("features", "label")
 
-    val nonFraudDF = featureDF.filter($"xattack" === 5.0)
+    val nonFraudDF = featureDF.filter($"xattack" === 0.0)
     val fraudCount = fraudDF.count()
 
 

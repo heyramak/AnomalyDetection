@@ -15,7 +15,7 @@ import org.apache.spark.ml.PipelineModel
 import org.apache.spark.ml.classification.RandomForestClassificationModel
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.DoubleType
+import org.apache.spark.sql.types.{DoubleType,TimestampType}
 import org.apache.spark.streaming.{Duration, StreamingContext}
 import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
@@ -102,9 +102,9 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
             from_json($"transaction", Schema.kafkaTransactionSchema)) //From binary to JSON object
           .select("transaction.*", "partition", "offset")
           .withColumn("duration", lit($"duration") cast DoubleType)
-          .withColumn("protocol_type", lit($"protocol_type") cast DoubleType)
-          .withColumn("service", lit($"service") cast DoubleType)
-          .withColumn("flag", lit($"flag") cast DoubleType)
+          //.withColumn("protocol_type", lit($"protocol_type") cast DoubleType)
+          //.withColumn("service", lit($"service") cast DoubleType)
+          //.withColumn("flag", lit($"flag") cast DoubleType)
           .withColumn("src_bytes", lit($"src_bytes") cast DoubleType)
           .withColumn("dst_bytes", lit($"dst_bytes") cast DoubleType)
           .withColumn("land", lit($"land") cast DoubleType)
@@ -142,7 +142,7 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
           .withColumn("dst_host_srv_serror_rate", lit($"dst_host_srv_serror_rate") cast DoubleType)
           .withColumn("dst_host_rerror_rate", lit($"dst_host_rerror_rate") cast DoubleType)
           .withColumn("dst_host_srv_rerror_rate", lit($"dst_host_srv_rerror_rate") cast DoubleType)
-
+          .withColumn("trans_time", expr("reflect('java.time.LocalDateTime', 'now')") cast TimestampType)
 
 
 
@@ -196,13 +196,13 @@ object DstreamFraudDetection extends SparkJob("Anomaly Detection using Dstream")
               logger.info("Prepare Statement for all three tables ")
               val xattack = record.getAs[Double]("xattack")
               logger.info("Crossed")
-              if (xattack != 5.0) {
+              if (xattack != 0.0) {
                 // Bind and execute prepared statement for Fraud Table
                 logger.info("if statement triggered")
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementAnomaly, record))
                 logger.info("Prepared statement for fraud table")
               }
-              else if(xattack == 5.0) {
+              else if(xattack == 0.0) {
                 // Bind and execute prepared statement for NonFraud Table
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementNormal, record))
                 logger.info("Prepared statement for normal table")
