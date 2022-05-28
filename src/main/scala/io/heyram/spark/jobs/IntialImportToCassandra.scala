@@ -8,8 +8,7 @@ import io.heyram.anomaly.Schema
 import io.heyram.spark.{DataReader, SparkConfig}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.TimestampType
-import java.text.SimpleDateFormat
-import java.util.Date
+
 
 object IntialImportToCassandra extends SparkJob("Initial Import to Cassandra"){
 
@@ -21,8 +20,6 @@ object IntialImportToCassandra extends SparkJob("Initial Import to Cassandra"){
 
     val transactionDF = DataReader.read(SparkConfig.trainingDatasource, Schema.transactionSchema)
 
-
-    val timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date())
 
     val processedDF = transactionDF
       .select("id","duration","protocol_type","service","flag","src_bytes",
