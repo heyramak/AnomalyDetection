@@ -1,6 +1,6 @@
 package io.heyram.spark
 
-import io.heyram.spark.jobs.FraudDetectionTraining._
+import io.heyram.spark.jobs.AnomalyDetectionTraining._
 import org.apache.log4j.Logger
 import org.apache.spark.ml.clustering.{KMeansModel, KMeans}
 import org.apache.spark.ml.linalg.SQLDataTypes._

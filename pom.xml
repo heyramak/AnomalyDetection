@@ -12,6 +12,10 @@
 
   <repositories>
     <repository>
+      <id>SparkPackagesRepo</id>
+      <url>https://repos.spark-packages.org/</url>
+    </repository>
+    <repository>
       <id>scala-tools.org</id>
       <name>Scala-Tools Maven2 Repository</name>
       <url>https://scala-tools.org/repo-releases</url>
@@ -27,6 +31,16 @@
   </pluginRepositories>
 
   <dependencies>
+    <dependency>
+      <groupId>sramirez</groupId>
+      <artifactId>spark-infotheoretic-feature-selection</artifactId>
+      <version>1.4.4</version>
+    </dependency>
+    <dependency>
+      <groupId>sramirez</groupId>
+      <artifactId>spark-MDLP-discretization</artifactId>
+      <version>1.4.1</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_${scala.tools.version}</artifactId>
@@ -209,7 +223,6 @@
   </build> -->
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>
-    <testSourceDirectory>src/test/scala</testSourceDirectory>
     <finalName>anomalydetection-spark</finalName>
     <plugins>
       <plugin>
