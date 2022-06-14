@@ -12,15 +12,14 @@ import io.heyram.spark.jobs.SparkJob
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.log4j.Logger
 import org.apache.spark.ml.PipelineModel
-import org.apache.spark.ml.classification.RandomForestClassificationModel
+import org.apache.spark.ml.classification.{NaiveBayesModel, RandomForestClassificationModel}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{DoubleType,TimestampType}
+import org.apache.spark.sql.types.{DoubleType, TimestampType}
 import org.apache.spark.streaming.{Duration, StreamingContext}
 import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies._
-
 
 import scala.collection.mutable
 
@@ -45,6 +44,7 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
     /* Load Preprocessing Model and Random Forest Model saved by Spark ML Job i.e AnomalyDetectionTraining */
     val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
     val randomForestModel = RandomForestClassificationModel.load(SparkConfig.randomForestModelPath)
+    val naiveBayesModel = NaiveBayesModel.load(SparkConfig.naiveBayesModelPath)
 
     /*
        Connector Object is created in driver. It is serializable.
@@ -145,9 +145,7 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
           .withColumn("trans_time", expr("reflect('java.time.LocalDateTime', 'now')") cast TimestampType)
 
 
-
-        kafkaTransactionDF.printSchema()
-        kafkaTransactionDF.show
+        //kafkaTransactionDF.show
 
 
         sparkSession.sqlContext.sql("SET spark.sql.autoBroadcastJoinThreshold = 52428800")
@@ -157,6 +155,7 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
         val predictionDF = randomForestModel.transform(featureTransactionDF)
           .withColumnRenamed("prediction", "xattack")
         logger.info("Crossed modelling phase")
+        predictionDF.show
 
 
         /*

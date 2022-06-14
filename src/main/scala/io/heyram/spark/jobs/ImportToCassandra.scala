@@ -2,6 +2,8 @@ package io.heyram.spark.jobs
 
 
 
+import java.util.UUID
+
 import io.heyram.cassandra.CassandraConfig
 import io.heyram.config.Config
 import io.heyram.anomaly.Schema
@@ -20,9 +22,9 @@ object ImportToCassandra extends SparkJob("Import to Cassandra"){
 
     val transactionDF = DataReader.read(SparkConfig.trainingDatasource, Schema.transactionSchema)
 
-
+    val generateUUID = udf(() => UUID.randomUUID().toString)
     val processedDF = transactionDF
-      .select("id","duration","protocol_type","service","flag","src_bytes",
+      .select("duration","protocol_type","service","flag","src_bytes",
         "dst_bytes","land","wrong_fragment","urgent","hot","num_failed_logins",
         "logged_in","num_compromised","root_shell","su_attempted","num_root",
         "num_file_creations","num_shells","num_access_files","num_outbound_cmds",
@@ -33,6 +35,7 @@ object ImportToCassandra extends SparkJob("Import to Cassandra"){
         "dst_host_srv_diff_host_rate","dst_host_serror_rate","dst_host_srv_serror_rate",
         "dst_host_rerror_rate","dst_host_srv_rerror_rate","xattack")
       .withColumn("trans_time", expr("reflect('java.time.LocalDateTime', 'now')") cast TimestampType)
+      .withColumn("id", generateUUID())
 
 
 

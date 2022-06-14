@@ -9,7 +9,6 @@ object Schema {
   val transactionStructureName = "transaction"
 
   val transactionSchema: StructType = new StructType()
-    .add(Enums.TransactionKafka.id, StringType, nullable = true)
     .add(Enums.TransactionKafka.duration, DoubleType, nullable = true)
     .add(Enums.TransactionKafka.protocol_type, StringType, nullable = true)
     .add(Enums.TransactionKafka.service, StringType, nullable = true)

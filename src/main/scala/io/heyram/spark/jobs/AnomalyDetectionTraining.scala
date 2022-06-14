@@ -8,7 +8,7 @@ import io.heyram.spark.pipeline.BuildPipeline
 import org.apache.spark.ml.Pipeline
 
 
-object AnomalyDetectionTraining extends SparkJob("Balancing Fraud & Non-Fraud Dataset"){
+object AnomalyDetectionTraining extends SparkJob("Anomaly Detection ML Training"){
 
 
   def main(args: Array[String]): Unit = {

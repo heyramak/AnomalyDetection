@@ -13,7 +13,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.streaming.{Duration, StreamingContext}
 
 
-object StructuredStreamingAnomalyDetection extends SparkJob("Structured Streaming Job to detect fraud transaction"){
+object StructuredStreamingAnomalyDetection extends SparkJob("Structured Streaming Job to detect anomaly transaction"){
 
   val logger: Logger = Logger.getLogger(getClass.getName)
 
