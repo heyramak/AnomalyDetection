@@ -31,7 +31,7 @@ def stopStartStreamingJob():
     remove_shutdown_marker = 'rm -rf /tmp/shutdownmarker'
     os.system(remove_shutdown_marker)
 
-    start_streaming = 'spark-submit --class io.heyram.spark.jobs.RealTimeFraudDection --name "RealTime Intrusion Detection" --master spark://heyram:7077' + ' '  + '--deploy-mode cluster' + ' ' + home + '/anomalydetection/spark/anomalydetection-spark.jar' + ' ' + home + '/anomalydetection/spark/application-local.conf &'
+    start_streaming = 'spark-submit --class io.heyram.spark.jobs.RealAnomalyFraudDection --name "RealTime Intrusion Detection" --master spark://heyram:7077' + ' '  + '--deploy-mode cluster' + ' ' + home + '/anomalydetection/spark/anomalydetection-spark.jar' + ' ' + home + '/anomalydetection/spark/application-local.conf &'
     os.system(start_streaming)
 
 if __name__ == '__main__':

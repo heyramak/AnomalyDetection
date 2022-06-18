@@ -1,5 +1,6 @@
 package io.heyram.spark.jobs.RealTimeAnomalyDetection
 
+import java.io.FileReader
 
 import com.datastax.spark.connector.cql.CassandraConnector
 import io.heyram.cassandra.dao.{IntrusionDetectionRepository, KafkaOffsetRepository}
@@ -20,6 +21,10 @@ import org.apache.spark.streaming.{Duration, StreamingContext}
 import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies._
+import com.flyberrycapital.slack.SlackClient
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import java.io.BufferedReader
 
 import scala.collection.mutable
 
@@ -43,8 +48,8 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
 
     /* Load Preprocessing Model and Random Forest Model saved by Spark ML Job i.e AnomalyDetectionTraining */
     val preprocessingModel = PipelineModel.load(SparkConfig.preprocessingModelPath)
-    val randomForestModel = RandomForestClassificationModel.load(SparkConfig.randomForestModelPath)
-    val naiveBayesModel = NaiveBayesModel.load(SparkConfig.naiveBayesModelPath)
+    val randomForestModel = RandomForestClassificationModel.load(SparkConfig.randomForestWithoutKMeansModelPath)
+    //val naiveBayesModel = NaiveBayesModel.load(SparkConfig.naiveBayesModelPath)
 
     /*
        Connector Object is created in driver. It is serializable.
@@ -59,6 +64,7 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
 
 
     val ssc = new StreamingContext(sparkSession.sparkContext, Duration(SparkConfig.batchInterval))
+
 
 
     val topics = Set(KafkaConfig.kafkaParams("topic"))
@@ -151,6 +157,7 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
         sparkSession.sqlContext.sql("SET spark.sql.autoBroadcastJoinThreshold = 52428800")
 
 
+
         val featureTransactionDF = preprocessingModel.transform(kafkaTransactionDF)
         val predictionDF = randomForestModel.transform(featureTransactionDF)
           .withColumnRenamed("prediction", "xattack")
@@ -177,11 +184,7 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
  /*
           Writing to Anomaly, Normal and Offset Table in single iteration
           Cassandra prepare statement is used because it avoids pasring of the column for every insert and hence efficient
-          Offset is inserted last to achieve atleast once semantics. it is possible that it may read duplicate creditcard
-          transactions from kafka while restart.
-          Even though duplicate creditcard transaction are read from kafka, writing to Cassandra is idempotent. Becasue
-          cc_num and trans_time is the primary key. So you cannot have duplicate records with same cc_num and trans_time.
-          As a result we achive exactly once semantics.
+          Offset is inserted last to achieve atleast once semantics.
 */
 
           connector.withSessionDo(session => {
@@ -192,19 +195,23 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
 
             val partitionOffset:mutable.Map[Int, Long] = mutable.Map.empty
             partitionOfRecords.foreach(record => {
-              logger.info("Prepare Statement for all three tables ")
               val xattack = record.getAs[Double]("xattack")
-              logger.info("Crossed")
+              val id = record.getAs[String]("id")
+              val path = SparkConfig.attackTypes
+              val bufferedReader = new BufferedReader(new FileReader(path))
+              val gson = new Gson
+              val js = gson.fromJson(bufferedReader, classOf[JsonObject])
+              val attacktype = js.get(xattack.toString()).getAsString
               if (xattack != 0.0) {
                 // Bind and execute prepared statement for Anomaly Table
-                logger.info("if statement triggered")
+                val s = new SlackClient("xoxb-3653430754599-3667220974597-8cD0yBWV9Co99ZdAnlOZozQC")
+                val text = "Id: " + id + "\n" + "Attack type: " + attacktype
+                s.chat.postMessage("#detecting-anomalies", text)
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementAnomaly, record))
-                logger.info("Prepared statement for fraud table")
               }
               else if(xattack == 0.0) {
                 // Bind and execute prepared statement for Normal Table
                 session.execute(IntrusionDetectionRepository.cqlTransactionBind(preparedStatementNormal, record))
-                logger.info("Prepared statement for normal table")
               }
               //Get max offset in the current match
               val kafkaPartition = record.getAs[Int]("partition")
@@ -241,3 +248,4 @@ object DstreamAnomalyDetection extends SparkJob("Anomaly Detection using Dstream
   }
 
 }
+

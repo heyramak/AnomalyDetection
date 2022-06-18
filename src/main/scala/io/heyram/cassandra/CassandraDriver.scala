@@ -1,6 +1,9 @@
 package io.heyram.cassandra
 
+import java.io.{BufferedReader, FileReader}
+
 import com.datastax.spark.connector.cql.CassandraConnector
+import com.google.gson.{Gson, JsonObject}
 import io.heyram.cassandra.foreachSink.CassandraSinkForeach
 import io.heyram.spark.SparkConfig
 import org.apache.kafka.common.TopicPartition

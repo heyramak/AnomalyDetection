@@ -6,6 +6,11 @@ import io.heyram.config.Config
 import io.heyram.spark.algorithms.Algorithms
 import io.heyram.spark.pipeline.BuildPipeline
 import org.apache.spark.ml.Pipeline
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+import org.apache.spark.ml.feature.PCA
+
+
 
 
 object AnomalyDetectionTraining extends SparkJob("Anomaly Detection ML Training"){
@@ -16,6 +21,8 @@ object AnomalyDetectionTraining extends SparkJob("Anomaly Detection ML Training"
     Config.parseArgs(args)
 
     import sparkSession.implicits._
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
 
     val anomalyDF = DataReader.readFromCassandra(CassandraConfig.keyspace, CassandraConfig.anomalyTable)
       .select("duration","protocol_type","service","flag","src_bytes",
@@ -62,29 +69,44 @@ object AnomalyDetectionTraining extends SparkJob("Anomaly Detection ML Training"
     PreprocessingTransformerModel.write.overwrite().save(SparkConfig.preprocessingModelPath)
 
     val featureDF = PreprocessingTransformerModel.transform(transactionDF)
-
-
-    val fraudDF = featureDF
-      .filter($"xattack" =!= 0.0)
       .withColumnRenamed("xattack", "label")
+
+    /*val fraudDF = featureDF
+      .filter($"xattack" =!= 0.0)
       .select("features", "label")
 
     val nonFraudDF = featureDF.filter($"xattack" === 0.0)
-    val fraudCount = fraudDF.count()
+    val fraudCount = fraudDF.count()*/
 
 
     /* There will be very few fraud transaction and more normal transaction. Models created  from such
      * imbalanced data will not have good prediction accuracy. Hence balancing the dataset. K-means is used for balancing
      */
-    val balancedNonFraudDF = DataBalancing.createBalancedDataframe(nonFraudDF, fraudCount.toInt)
-    val finalfeatureDF = fraudDF.union(balancedNonFraudDF)
+
+    /*val balancedNonFraudDF = DataBalancing.createBalancedDataframe(nonFraudDF, fraudCount.toInt)
+    val finalfeatureDF = fraudDF.union(balancedNonFraudDF)*/
+
+    //RandomForestwithoutKmeans
+    val randomForestModel = Algorithms.randomForestClassifier(featureDF)
+    randomForestModel.write.overwrite().save(SparkConfig.randomForestWithoutKMeansModelPath)
+
+    //RandomForestKMeans
+    //val randomForestModel = Algorithms.randomForestClassifier(finalfeatureDF)
+    //randomForestModel.write.overwrite().save(SparkConfig.randomForestModelPath)
+
+    //NaiveNayesKMeans
+    //val naiveBayesModel = Algorithms.naiveBayes(finalfeatureDF)
+    //naiveBayesModel.write.overwrite().save(SparkConfig.naiveBayesModelPath)
+
+    //NaiveBayesWithoutKMeans
+    //val naiveBayesModel = Algorithms.naiveBayes(featureDF)
+    //naiveBayesModel.write.overwrite().save(SparkConfig.naiveBayesModelPath)
+
+    //MultinomialLogisticRegression
+    //val logisticRegressionModel = Algorithms.logisticRegression(featureDF)
+    //logisticRegressionModel.write.overwrite().save(SparkConfig.logisticRegressionModelPath)
 
 
-    val randomForestModel = Algorithms.randomForestClassifier(finalfeatureDF)
-    randomForestModel.write.overwrite().save(SparkConfig.randomForestModelPath)
-
-    val naiveBayesModel = Algorithms.naiveBayes(finalfeatureDF)
-    naiveBayesModel.write.overwrite().save(SparkConfig.naiveBayesModelPath)
 
   }
 

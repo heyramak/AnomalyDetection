@@ -1,5 +1,9 @@
 package io.heyram.spark.jobs.RealTimeAnomalyDetection
 
+import java.io.{BufferedReader, FileReader}
+
+import com.flyberrycapital.slack.SlackClient
+import com.google.gson.{Gson, JsonObject}
 import io.heyram.spark.{DataReader, GracefulShutdown, SparkConfig}
 import io.heyram.cassandra.{CassandraConfig, CassandraDriver}
 import io.heyram.config.Config
@@ -31,7 +35,7 @@ object StructuredStreamingAnomalyDetection extends SparkJob("Structured Streamin
 
     val transactionStream = rawStream
       .selectExpr("transaction.*")
-    transactionStream.printSchema()
+    //transactionStream.printSchema()
 
 
 
@@ -46,11 +50,11 @@ object StructuredStreamingAnomalyDetection extends SparkJob("Structured Streamin
         $"diff_srv_rate",$"srv_diff_host_rate",$"dst_host_count",$"dst_host_srv_count",
         $"dst_host_same_srv_rate",$"dst_host_diff_srv_rate",$"dst_host_same_src_port_rate",
         $"dst_host_srv_diff_host_rate",$"dst_host_serror_rate",$"dst_host_srv_serror_rate",
-        $"dst_host_rerror_rate",$"dst_host_srv_rerror_rate")
+        $"dst_host_rerror_rate",$"dst_host_srv_rerror_rate",$"trans_time")
       .withColumn("duration", lit($"duration") cast DoubleType)
-      .withColumn("protocol_type", lit($"protocol_type") cast DoubleType)
-      .withColumn("service", lit($"service") cast DoubleType)
-      .withColumn("flag", lit($"flag") cast DoubleType)
+     // .withColumn("protocol_type", lit($"protocol_type") cast DoubleType)
+     // .withColumn("service", lit($"service") cast DoubleType)
+     // .withColumn("flag", lit($"flag") cast DoubleType)
       .withColumn("src_bytes", lit($"src_bytes") cast DoubleType)
       .withColumn("dst_bytes", lit($"dst_bytes") cast DoubleType)
       .withColumn("land", lit($"land") cast DoubleType)
@@ -88,6 +92,7 @@ object StructuredStreamingAnomalyDetection extends SparkJob("Structured Streamin
       .withColumn("dst_host_srv_serror_rate", lit($"dst_host_srv_serror_rate") cast DoubleType)
       .withColumn("dst_host_rerror_rate", lit($"dst_host_rerror_rate") cast DoubleType)
       .withColumn("dst_host_srv_rerror_rate", lit($"dst_host_srv_rerror_rate") cast DoubleType)
+      .withColumn("trans_time", expr("reflect('java.time.LocalDateTime', 'now')") cast TimestampType)
 
 
 
@@ -96,16 +101,12 @@ object StructuredStreamingAnomalyDetection extends SparkJob("Structured Streamin
 
         val randomForestModel = RandomForestClassificationModel.load(SparkConfig.randomForestModelPath)
         val predictionDF =  randomForestModel.transform(featureTransactionDF)
-        predictionDF.cache
+          .withColumnRenamed("prediction", "xattack")
+        //predictionDF.cache
         //predictionDF.printSchema()
-        val anomalyPredictionDF = predictionDF.filter($"prediction" =!= 5.0)
-        anomalyPredictionDF.withColumnRenamed("prediction","xattack")
+        val anomalyPredictionDF = predictionDF.filter($"xattack" =!= 0.0)
 
-
-        val normalPredictionDF = predictionDF.filter($"prediction" === 5.0)
-        normalPredictionDF.withColumnRenamed("prediction","xattack")
-        logger.info("Crossed 1")
-
+        val normalPredictionDF = predictionDF.filter($"xattack" === 0.0)
 
         /*Save anomaly transactions to anomaly table*/
         val anomalyQuery = CassandraDriver.saveForeach(anomalyPredictionDF, CassandraConfig.keyspace, CassandraConfig.anomalyTable, "anomalyQuery", "append")

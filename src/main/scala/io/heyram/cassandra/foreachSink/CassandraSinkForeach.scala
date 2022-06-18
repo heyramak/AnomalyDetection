@@ -105,7 +105,7 @@ class CassandraSinkForeach(dbName:String, tableName:String) extends ForeachWrite
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_serror_rate)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_rerror_rate)},
         ${record.getAs[Double](Enums.TransactionCassandra.dst_host_srv_rerror_rate)},
-       '${record.getAs[Double](Enums.TransactionCassandra.xattack)}'
+        ${record.getAs[Double](Enums.TransactionCassandra.xattack)}
         )"""
 
 
